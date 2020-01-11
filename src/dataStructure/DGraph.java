@@ -4,6 +4,12 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 
+import org.json.JSONObject;
+
+import utils.Point3D;
+
+import org.json.JSONArray;
+
 public class DGraph implements graph, Serializable {
 
 	/**
@@ -218,6 +224,30 @@ public class DGraph implements graph, Serializable {
 	 */
 	public DGraph copy() {
 		return new DGraph(this);
+	}
+
+	public void initFromJson(String graph) {
+		JSONObject line;
+		try {
+			line = new JSONObject(graph);
+			JSONArray nodesArr = line.getJSONArray("Nodes");
+			for (int i = 0; i < nodesArr.length(); i++) {
+				JSONObject node = (JSONObject) nodesArr.get(i);
+				String split[] = node.getString("pos").split(",");
+				Point3D p = new Point3D(Double.parseDouble(split[0]), Double.parseDouble(split[1]));
+				node_data n = new Node(node.getInt("id"), p);
+				this.addNode(n);
+			}
+			JSONArray edgesArr = line.getJSONArray("Edges");
+			for (int i = 0; i < edgesArr.length(); i++) {
+				JSONObject edge = (JSONObject) edgesArr.get(i);
+				this.connect(edge.getInt("src"), edge.getInt("dest"), edge.getDouble("w"));
+			}
+
+		} catch (Exception ex) {
+			System.out.println(ex);
+		}
+
 	}
 
 }

@@ -8,6 +8,7 @@ public class Node implements node_data {
 	private double weight;
 	private String info;
 	private int tag;
+	private Point3D guiLocation;
 
 	/**
 	 * Empty constructor
@@ -144,6 +145,18 @@ public class Node implements node_data {
 		setTag(0);
 		setInfo("");
 		setWeight(Double.MAX_VALUE);
+	}
+	/**
+	 * @return the guiLocation
+	 */
+	public Point3D getGuiLocation() {
+		return guiLocation;
+	}
+	/**
+	 * @param guiLocation the guiLocation to set
+	 */
+	public void setGuiLocation(Point3D guiLocation) {
+		this.guiLocation = guiLocation;
 	}
 
 }
