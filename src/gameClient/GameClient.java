@@ -34,14 +34,14 @@ public class GameClient implements Runnable {
 		dg = new DGraph();
 		dg.initFromJson(game.getGraph());
 		fruitList = new ArrayList<Fruit>();
-		robotList = new ArrayList<Robot>();
 
-		setFruitsOnEdges();
-		setRobotsOnNodes();
+		initFruitsOnEdges();
+		initRobotsOnNodes();
 	}
 
-	public void setRobotsOnNodes() {
-
+	public void initRobotsOnNodes() {
+		if (dg == null)
+			throw new RuntimeException("Please fill graph first");
 		String info = game.toString();
 		JSONObject line;
 		try {
@@ -55,11 +55,7 @@ public class GameClient implements Runnable {
 					game.addRobot(i);
 				}
 			}
-			List<String> robots = game.getRobots();
-			for (String string : robots) {
-				this.addRobot(new Robot(string));
-				dg.upgradeMC();
-			}
+			this.updateRobots();
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -81,19 +77,14 @@ public class GameClient implements Runnable {
 	}
 
 	public void updateFruits() {
-		fruitList = new ArrayList<Fruit>();
-		setFruitsOnEdges();
-//		List<String> robots = game.getRobots();
-//		for (String string : robots) {
-//			this.addRobot(new Robot(string));
-//		}
+		initFruitsOnEdges();
 
 	}
 
-	public void setFruitsOnEdges() {
+	public void initFruitsOnEdges() {
 		if (dg == null)
 			throw new RuntimeException("Please fill graph first");
-
+		fruitList = new ArrayList<Fruit>();
 		Iterator<String> f_iter = game.getFruits().iterator();
 		while (f_iter.hasNext()) {
 			String next = f_iter.next();
@@ -224,7 +215,7 @@ public class GameClient implements Runnable {
 			updateRobots();
 			updateFruits();
 			try {
-				if(ind%2 ==0) {
+				if (ind % 2 == 0) {
 					dg.upgradeMC();
 				}
 				Thread.sleep(dt);
@@ -233,12 +224,6 @@ public class GameClient implements Runnable {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-//			List<String> robots = game.getRobots();
-//			for (String string : robots) {
-//				System.out.println(string);
-//			}
-//			setFruitsOnEdges();
-//			setRobotsOnNodes();
 		}
 	}
 }
