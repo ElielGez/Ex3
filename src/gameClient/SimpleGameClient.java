@@ -29,10 +29,10 @@ import oop_dataStructure.oop_graph;
  */
 public class SimpleGameClient {
 	public static void main(String[] a) {
-//		test1();
-		game_service game = Game_Server.getServer(2); // you have [0,23] games
-		String g = game.getGraph();
-		System.out.println(g);
+		test1();
+//		game_service game = Game_Server.getServer(2); // you have [0,23] games
+//		String g = game.getGraph();
+//		System.out.println(g);
 	}
 
 	public static void test1() {

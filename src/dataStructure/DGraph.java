@@ -189,6 +189,10 @@ public class DGraph implements graph, Serializable {
 	public int getMC() {
 		return this.mc;
 	}
+	
+	public void upgradeMC() {
+		this.mc++;
+	}
 
 	/**
 	 * Function to print vertices of the graph only

@@ -16,18 +16,23 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Ellipse2D;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import algorithms.Graph_Algo;
 import dataStructure.DGraph;
+import dataStructure.Fruit;
 import dataStructure.Node;
+import dataStructure.Robot;
 import dataStructure.edge_data;
 import dataStructure.graph;
 import dataStructure.node_data;
@@ -42,6 +47,9 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 	private static final String STAGE = "Stage";
 	private final int WIDTH = 1000;
 	private final int HEIGHT = 1000;
+	private final int X_SCALE_TMIN = 15;
+	private final int Y_SCALE_TMIN = 200;
+	private final int Y_SCALE_TMAX = 50;
 
 	/**
 	 * Empty constructor
@@ -108,9 +116,22 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 	 * Function to draw the graph on the JFrame
 	 */
 	public void paint(Graphics g) {
-		super.paint(g);
-		if (this.getG() != null)
-			this.drawGraph(g);
+		// super.paint(g);
+		try {
+			if (this.getG() != null) {
+				BufferedImage bufferedImage = new BufferedImage(this.WIDTH, this.HEIGHT, BufferedImage.TYPE_INT_ARGB);
+				Graphics2D g2d = bufferedImage.createGraphics();
+				g2d.setBackground(new Color(240, 240, 240));
+				g2d.clearRect(0, 0, this.WIDTH, this.HEIGHT);
+				// paint using g2d ...
+				this.drawGraph(g2d);
+				Graphics2D g2dComponent = (Graphics2D) g;
+				g2dComponent.drawImage(bufferedImage, null, 0, 0);
+			}
+		} catch (Exception ex) {
+			System.out.println(ex);
+			ex.printStackTrace();
+		}
 	}
 
 	/**
@@ -121,10 +142,16 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 		Thread t = new Thread(new Runnable() {
 			@Override
 			public void run() {
-				while (true && getG() != null) {
-					synchronized (getG()) {
-						if (getG().getMC() != mc) {
-							mc = getG().getMC();
+				while (true) {
+					synchronized (gc) {
+						if (gc.getGraph() != null && gc.getGraph().getMC() != mc) {
+							mc = gc.getGraph().getMC();
+//							try {
+//								Thread.sleep(1000);
+//							} catch (InterruptedException e) {
+//								// TODO Auto-generated catch block
+//								e.printStackTrace();
+//							}
 							repaint();
 						}
 					}
@@ -134,15 +161,38 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 		t.start();
 	}
 
-	private void setNodeGuiLocations() {
+	private void setGuiLocations() {
 		graph g = this.gc.getGraph();
 		double x_scale[] = xAxis_Min_Max(g);
 		double y_scale[] = yAxis_Min_Max(g);
+
+		// node set guid location
 		for (node_data n : g.getV()) {
-			double x = scale(n.getLocation().x(), x_scale[0], x_scale[1], 15, this.getWidth() - 50);
-			double y = scale(n.getLocation().y(), y_scale[0], y_scale[1], 70, this.getHeight() - 50);
+			double x = scale(n.getLocation().x(), x_scale[0], x_scale[1], X_SCALE_TMIN, this.getWidth() - Y_SCALE_TMAX);
+			double y = scale(n.getLocation().y(), y_scale[1], y_scale[0], Y_SCALE_TMIN,
+					this.getHeight() - Y_SCALE_TMAX);
 			Point3D p = new Point3D(x, y);
 			n.setGuiLocation(p);
+		}
+
+		// fruit set gui location
+		for (Fruit f : gc.fruitList()) {
+			double xF = scale(f.getLocation().x(), x_scale[0], x_scale[1], X_SCALE_TMIN,
+					this.getWidth() - Y_SCALE_TMAX);
+			double yF = scale(f.getLocation().y(), y_scale[1], y_scale[0], Y_SCALE_TMIN,
+					this.getHeight() - Y_SCALE_TMAX);
+			Point3D pF = new Point3D(xF, yF);
+			f.setGuiLocation(pF);
+		}
+
+		// robot set gui location
+		for (Robot r : gc.robotList()) {
+			double xR = scale(r.getLocation().x(), x_scale[0], x_scale[1], X_SCALE_TMIN,
+					this.getWidth() - Y_SCALE_TMAX);
+			double yR = scale(r.getLocation().y(), y_scale[1], y_scale[0], Y_SCALE_TMIN,
+					this.getHeight() - Y_SCALE_TMAX);
+			Point3D pR = new Point3D(xR, yR);
+			r.setGuiLocation(pR);
 		}
 	}
 
@@ -151,11 +201,16 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 	 * 
 	 * @param g1
 	 */
-	private void drawGraph(Graphics gg) {
-		setNodeGuiLocations();
+	private void drawGraph(Graphics2D g) {
+		setGuiLocations();
 
-		Graphics2D g = (Graphics2D) gg;
+		g.setColor(Color.RED);
 		g.setFont(new Font("Arial", 1, 15));
+		List<String> rob = gc.getGameRobots();
+		for (int i = 1; i <= rob.size(); i++) {
+			g.drawString(rob.get(i - 1), 100, 70 + (20 * i));
+		}
+		g.drawString("Time left: " + gc.getGameClock(), 900, 100);
 		for (node_data src : this.getG().getV()) {
 			Point3D pSrc = src.getGuiLocation();
 			g.setColor(Color.BLUE);
@@ -171,20 +226,50 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 						Point3D pDest = dest.getGuiLocation();
 						g.setColor(Color.DARK_GRAY);
 						g.drawLine(pSrc.ix(), pSrc.iy(), pDest.ix(), pDest.iy());
-//						g.setColor(Color.RED);
-//						int centerX = (pSrc.ix() + pDest.ix()) / 2;
-//						int centerY = (pSrc.iy() + pDest.iy()) / 2;
-//						g.drawString("" + edge.getWeight(), centerX, centerY);
-//						for (int i = 0; i < 2; i++) {
-//							centerX = (centerX + pSrc.ix()) / 2;
-//							centerY = (centerY + pSrc.iy()) / 2;
-//						}
-//						g.setColor(new Color(255, 196, 30));
-//						g.fillOval(centerX - 3, centerY - 3, 8, 8);
+
+						int centerX = (pSrc.ix() + pDest.ix()) / 2;
+						int centerY = (pSrc.iy() + pDest.iy()) / 2;
+						for (int i = 0; i < 2; i++) {
+							centerX = (centerX + pSrc.ix()) / 2;
+							centerY = (centerY + pSrc.iy()) / 2;
+						}
+						g.setColor(Color.RED);
+						g.fillOval(centerX - 3, centerY, 5, 5);
 					}
 				}
 			}
 		}
+		for (Fruit f : gc.fruitList()) {
+			Point3D pFruit = f.getGuiLocation();
+			if (pFruit != null) {// need to remove , prevent null pointer exception (from thread synchronized...)
+				if (f.getType() == -1)
+					g.setColor(new Color(255, 196, 30)); // banana
+				if (f.getType() == 1)
+					g.setColor(Color.GREEN); // apple
+				Shape fruitCircle = new Arc2D.Double(pFruit.x() - 9, pFruit.y() - 5, 20, 20, 0, 360, Arc2D.CHORD);
+				g.fill(fruitCircle);
+				g.setColor(Color.DARK_GRAY);
+				g.drawString("" + f.getValue(), pFruit.ix(), pFruit.iy());
+			}
+
+		}
+		for (Robot r : gc.robotList()) {
+			BufferedImage img;
+			try {
+				img = ImageIO.read(new File("./images/robot.png"));
+				Point3D pRobot = r.getGuiLocation();
+				if (pRobot != null) // need to remove , prevent null pointer exception (from thread synchronized...)
+					g.drawImage(img, pRobot.ix() - 15, pRobot.iy() - 15, null);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+//			Ellipse2D.Double robotCircle = new Ellipse2D.Double(pRobot.x() - 9, pRobot.y() - 5, 17, 17);
+//			g.draw(robotCircle);
+//			g.drawOval(pRobot.ix(), pRobot.iy(), 20, 20);
+
+		}
+
 	}
 
 	private double[] xAxis_Min_Max(graph g) {
@@ -256,6 +341,8 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 				stage = Integer.parseInt(s);
 				this.initStage(stage);
 				repaint();
+				Thread t = new Thread(gc);
+				t.start();
 
 			} catch (Exception ex) {
 				JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
