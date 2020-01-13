@@ -146,12 +146,6 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 					synchronized (gc) {
 						if (gc.getGraph() != null && gc.getGraph().getMC() != mc) {
 							mc = gc.getGraph().getMC();
-//							try {
-//								Thread.sleep(1000);
-//							} catch (InterruptedException e) {
-//								// TODO Auto-generated catch block
-//								e.printStackTrace();
-//							}
 							repaint();
 						}
 					}
