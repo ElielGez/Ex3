@@ -19,6 +19,7 @@ import dataStructure.node_data;
 import utils.Point3D;
 
 public class GameClient implements Runnable {
+	private boolean isManual;
 	private DGraph dg;
 	private game_service game;
 	private ArrayList<Fruit> fruitList;
@@ -69,9 +70,11 @@ public class GameClient implements Runnable {
 
 	public void updateRobots() {
 		robotList = new ArrayList<Robot>();
-		List<String> robots = game.getRobots();
-		for (String string : robots) {
-			this.addRobot(new Robot(string));
+		synchronized (robotList) {
+			List<String> robots = game.getRobots();
+			for (String string : robots) {
+				this.addRobot(new Robot(string));
+			}
 		}
 
 	}
@@ -85,24 +88,26 @@ public class GameClient implements Runnable {
 		if (dg == null)
 			throw new RuntimeException("Please fill graph first");
 		fruitList = new ArrayList<Fruit>();
-		Iterator<String> f_iter = game.getFruits().iterator();
-		while (f_iter.hasNext()) {
-			String next = f_iter.next();
-			Fruit f = new Fruit(next);
-			for (node_data src : dg.getV()) {
-				Collection<edge_data> e = dg.getE(src.getKey());
-				if (e != null) {
-					for (edge_data edge : e) {
-						if (isFruitOnEdge(edge, f)) {
-							f.setEdge(edge);
-							this.addFruit(f);
-							dg.upgradeMC();
+		synchronized (fruitList) {
+			Iterator<String> f_iter = game.getFruits().iterator();
+			while (f_iter.hasNext()) {
+				String next = f_iter.next();
+				Fruit f = new Fruit(next);
+				for (node_data src : dg.getV()) {
+					Collection<edge_data> e = dg.getE(src.getKey());
+					if (e != null) {
+						for (edge_data edge : e) {
+							if (isFruitOnEdge(edge, f)) {
+								f.setEdge(edge);
+								this.addFruit(f);
+								dg.upgradeMC();
+							}
 						}
 					}
 				}
 			}
+			this.sortFruits(Fruit.comp);
 		}
-		this.sortFruits(Fruit.comp);
 	}
 
 	public DGraph getGraph() {
@@ -157,28 +162,42 @@ public class GameClient implements Runnable {
 		return this.robotList;
 	}
 
-	private void moveRobots() {
-		List<String> log = game.move();
-		if (log != null) {
-			long t = game.timeToEnd();
-			for (int i = 0; i < log.size(); i++) {
-				String robot_json = log.get(i);
-				try {
-					JSONObject line = new JSONObject(robot_json);
-					JSONObject ttt = line.getJSONObject("Robot");
-					int rid = ttt.getInt("id");
-					int src = ttt.getInt("src");
-					int dest = ttt.getInt("dest");
+	private Robot getRobotById(int id) {
+		for (Robot robot : robotList) {
+			if (robot.getId() == id)
+				return robot;
+		}
+		return null;
+	}
 
-					if (dest == -1) {
-						dest = nextNode(dg, src);
-						game.chooseNextEdge(rid, dest);
+	public void moveRobot(int id, int dest) {
+		Robot r = getRobotById(id);
+		if (r == null)
+			throw new RuntimeException("Robot with id: " + id + " doesn't exist");
+		if (dg.getEdge(r.getSrc(), dest) == null)
+			throw new RuntimeException("There is no edge between src: " + r.getSrc() + " dest: " + dest);
+		game.chooseNextEdge(id, dest);
+	}
+
+	private void moveRobots() {
+		long t = game.timeToEnd();
+		List<String> robots = game.getRobots();
+		for (String robot_json : robots) {
+			try {
+				JSONObject line = new JSONObject(robot_json);
+				JSONObject ttt = line.getJSONObject("Robot");
+				int rid = ttt.getInt("id");
+				int src = ttt.getInt("src");
+				int dest = ttt.getInt("dest");
+
+				if (dest == -1) {
+					dest = nextNode(dg, src);
+					game.chooseNextEdge(rid, dest);
 //						System.out.println("Turn to node: " + dest + "  time to end:" + (t / 1000));
 //						System.out.println(ttt);
-					}
-				} catch (JSONException e) {
-					e.printStackTrace();
 				}
+			} catch (JSONException e) {
+				e.printStackTrace();
 			}
 		}
 	}
@@ -211,11 +230,14 @@ public class GameClient implements Runnable {
 		int ind = 0;
 		long dt = 50;
 		while (game.isRunning()) {
-			moveRobots();
+			if (!isManual) {
+				moveRobots();
+			}
 			updateRobots();
 			updateFruits();
 			try {
 				if (ind % 2 == 0) {
+					game.move();
 					dg.upgradeMC();
 				}
 				Thread.sleep(dt);
@@ -225,5 +247,13 @@ public class GameClient implements Runnable {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	public void setIsManual(boolean isManual) {
+		this.isManual = isManual;
+	}
+
+	public boolean IsManual() {
+		return this.isManual;
 	}
 }

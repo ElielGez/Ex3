@@ -12,6 +12,8 @@ import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.Arc2D;
@@ -21,8 +23,10 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
@@ -43,6 +47,9 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 	private GameClient gc;
 	private int mc;
 	private Graph_Algo ga = new Graph_Algo();
+
+	private int MOVE_ROBOT_ID = -1;
+	private int MOVE_TO_DEST = -1;
 
 	private static final String STAGE = "Stage";
 	private final int WIDTH = 1000;
@@ -110,6 +117,7 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 		load.add(stage);
 
 		this.addMouseListener(this);
+
 	}
 
 	/**
@@ -169,24 +177,28 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 			n.setGuiLocation(p);
 		}
 
-		// fruit set gui location
-		for (Fruit f : gc.fruitList()) {
-			double xF = scale(f.getLocation().x(), x_scale[0], x_scale[1], X_SCALE_TMIN,
-					this.getWidth() - Y_SCALE_TMAX);
-			double yF = scale(f.getLocation().y(), y_scale[1], y_scale[0], Y_SCALE_TMIN,
-					this.getHeight() - Y_SCALE_TMAX);
-			Point3D pF = new Point3D(xF, yF);
-			f.setGuiLocation(pF);
+		synchronized (gc.fruitList()) {
+			// fruit set gui location
+			for (Fruit f : gc.fruitList()) {
+				double xF = scale(f.getLocation().x(), x_scale[0], x_scale[1], X_SCALE_TMIN,
+						this.getWidth() - Y_SCALE_TMAX);
+				double yF = scale(f.getLocation().y(), y_scale[1], y_scale[0], Y_SCALE_TMIN,
+						this.getHeight() - Y_SCALE_TMAX);
+				Point3D pF = new Point3D(xF, yF);
+				f.setGuiLocation(pF);
+			}
 		}
 
-		// robot set gui location
-		for (Robot r : gc.robotList()) {
-			double xR = scale(r.getLocation().x(), x_scale[0], x_scale[1], X_SCALE_TMIN,
-					this.getWidth() - Y_SCALE_TMAX);
-			double yR = scale(r.getLocation().y(), y_scale[1], y_scale[0], Y_SCALE_TMIN,
-					this.getHeight() - Y_SCALE_TMAX);
-			Point3D pR = new Point3D(xR, yR);
-			r.setGuiLocation(pR);
+		synchronized (gc.robotList()) {
+			// robot set gui location
+			for (Robot r : gc.robotList()) {
+				double xR = scale(r.getLocation().x(), x_scale[0], x_scale[1], X_SCALE_TMIN,
+						this.getWidth() - Y_SCALE_TMAX);
+				double yR = scale(r.getLocation().y(), y_scale[1], y_scale[0], Y_SCALE_TMIN,
+						this.getHeight() - Y_SCALE_TMAX);
+				Point3D pR = new Point3D(xR, yR);
+				r.setGuiLocation(pR);
+			}
 		}
 	}
 
@@ -233,9 +245,9 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 				}
 			}
 		}
-		for (Fruit f : gc.fruitList()) {
-			Point3D pFruit = f.getGuiLocation();
-			if (pFruit != null) {// need to remove , prevent null pointer exception (from thread synchronized...)
+		synchronized (gc.fruitList()) {
+			for (Fruit f : gc.fruitList()) {
+				Point3D pFruit = f.getGuiLocation();
 				if (f.getType() == -1)
 					g.setColor(new Color(255, 196, 30)); // banana
 				if (f.getType() == 1)
@@ -244,24 +256,22 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 				g.fill(fruitCircle);
 				g.setColor(Color.DARK_GRAY);
 				g.drawString("" + f.getValue(), pFruit.ix(), pFruit.iy());
-			}
 
+			}
 		}
-		for (Robot r : gc.robotList()) {
-			BufferedImage img;
-			try {
-				img = ImageIO.read(new File("./images/robot.png"));
-				Point3D pRobot = r.getGuiLocation();
-				if (pRobot != null) // need to remove , prevent null pointer exception (from thread synchronized...)
+		synchronized (gc.robotList()) {
+			for (Robot r : gc.robotList()) {
+				BufferedImage img;
+				try {
+					img = ImageIO.read(new File("./images/robot.png"));
+					Point3D pRobot = r.getGuiLocation();
 					g.drawImage(img, pRobot.ix() - 15, pRobot.iy() - 15, null);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-//			Ellipse2D.Double robotCircle = new Ellipse2D.Double(pRobot.x() - 9, pRobot.y() - 5, 17, 17);
-//			g.draw(robotCircle);
-//			g.drawOval(pRobot.ix(), pRobot.iy(), 20, 20);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 
+			}
 		}
 
 	}
@@ -300,6 +310,49 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 
 	@Override
 	public void mousePressed(MouseEvent e) {
+		if (gc.IsManual()) {
+			int x = e.getX();
+			int y = e.getY();
+			Point3D p = new Point3D(x, y);
+			if (e.getClickCount() == 1) {
+				node_data n = findNodeByLocation(p);
+				if (n != null) {
+					MOVE_TO_DEST = n.getKey();
+					try {
+						gc.moveRobot(MOVE_ROBOT_ID, MOVE_TO_DEST);
+						MOVE_TO_DEST = -1;
+					} catch (Exception ex) {
+						System.out.println(ex);
+//						JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage(), "ERROR",
+//								JOptionPane.ERROR_MESSAGE);
+					}
+				}
+			}
+			if (e.getClickCount() == 2) {
+				Robot r = findRobotByLocation(p);
+				if (r != null) {
+					MOVE_ROBOT_ID = r.getId();
+				}
+			}
+		}
+	}
+
+	private node_data findNodeByLocation(Point3D p) {
+		for (node_data node : gc.getGraph().getV()) {
+			double distance = node.getGuiLocation().distance2D(p);
+			if (distance >= 0 && distance <= 15)
+				return node;
+		}
+		return null;
+	}
+
+	private Robot findRobotByLocation(Point3D p) {
+		for (Robot robot : gc.robotList()) {
+			double distance = robot.getGuiLocation().distance2D(p);
+			if (distance >= 0 && distance <= 25)
+				return robot;
+		}
+		return null;
 
 	}
 
@@ -335,6 +388,13 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 				stage = Integer.parseInt(s);
 				this.initStage(stage);
 				repaint();
+				int reply = JOptionPane.showConfirmDialog(null, "You want to run manually?", "Choose mode",
+						JOptionPane.YES_NO_OPTION);
+				if (reply == JOptionPane.YES_OPTION) {
+					gc.setIsManual(true);
+				} else {
+					gc.setIsManual(false);
+				}
 				Thread t = new Thread(gc);
 				t.start();
 
