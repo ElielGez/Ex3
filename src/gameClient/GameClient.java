@@ -16,6 +16,7 @@ public class GameClient implements Runnable {
 	private graph g;
 	private game_service game;
 	private GameAlgo game_algo;
+	private KML_Logger log;
 
 	public static final double EPS = 0.000001;
 
@@ -28,6 +29,7 @@ public class GameClient implements Runnable {
 	 * @param stage
 	 */
 	public GameClient(int stage) {
+		log = new KML_Logger(stage, "moshe");
 		game = Game_Server.getServer(stage);
 		g = new DGraph();
 		g.initFromJson(game.getGraph());
@@ -100,6 +102,10 @@ public class GameClient implements Runnable {
 	public List<String> getGameRobots() {
 		return game.getRobots();
 	}
+	
+	public KML_Logger getKMLog() {
+		return this.log;
+	}
 
 	/**
 	 * Override function of runnable , this function run the game on thread and
@@ -126,6 +132,7 @@ public class GameClient implements Runnable {
 				ind++;
 			}
 			g.upgradeMC();
+			log.closeDocument();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

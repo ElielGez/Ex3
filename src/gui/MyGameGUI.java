@@ -64,6 +64,10 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 		gc = new GameClient(stage);
 		this.ga = gc.getGameAlgo();
 		this.mc = this.getG().getMC();
+
+		for (node_data n : getG().getV()) {
+			gc.getKMLog().addNodePlaceMark("" + n.getLocation());
+		}
 	}
 
 	/**
@@ -257,15 +261,18 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 		synchronized (ga.fruitList()) {
 			for (Fruit f : ga.fruitList()) {
 				Point3D pFruit = f.getGuiLocation();
-				if (f.getType() == -1)
-					g.setColor(new Color(255, 196, 30)); // banana
-				if (f.getType() == 1)
-					g.setColor(Color.GREEN); // apple
-				Shape fruitCircle = new Arc2D.Double(pFruit.x() - 9, pFruit.y() - 5, 20, 20, 0, 360, Arc2D.CHORD);
-				g.fill(fruitCircle);
-				g.setColor(Color.DARK_GRAY);
-				g.drawString("" + f.getValue(), pFruit.ix(), pFruit.iy());
-
+				if (pFruit != null) {
+					int type = f.getType();
+					if (type == -1)
+						g.setColor(new Color(255, 196, 30)); // banana
+					if (type == 1)
+						g.setColor(Color.GREEN); // apple
+					Shape fruitCircle = new Arc2D.Double(pFruit.x() - 9, pFruit.y() - 5, 20, 20, 0, 360, Arc2D.CHORD);
+					g.fill(fruitCircle);
+					g.setColor(Color.DARK_GRAY);
+					g.drawString("" + f.getValue(), pFruit.ix(), pFruit.iy());
+					gc.getKMLog().addPlaceMark(type == -1 ? "fruit-banana" : "fruit-apple", "" + f.getLocation());
+				}
 			}
 		}
 	}
@@ -283,6 +290,7 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 					img = ImageIO.read(new File("./images/robot.png"));
 					Point3D pRobot = r.getGuiLocation();
 					g.drawImage(img, pRobot.ix() - 15, pRobot.iy() - 15, null);
+					gc.getKMLog().addPlaceMark("robot", "" + r.getLocation());
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -303,14 +311,14 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 		g.setFont(new Font("Arial", 1, 15));
 		List<String> rob = gc.getGameRobots();
 		for (int i = 0; i < rob.size(); i++) {
-			g.drawString(rob.get(i), 130, 100 + (20 * i));
+			g.drawString(rob.get(i), 130, 120 + (20 * i));
 		}
 
 		g.setColor(Color.BLUE);
 		g.setFont(new Font("Arial", 1, 17));
 		if (gc.getGame().isRunning())
-			g.drawString("Time left: " + gc.getGameClock(), 30, 70);
-		g.drawString("Score: " + gc.getGameGrade(), 900, 70);
+			g.drawString("Time left: " + gc.getGameClock(), 30, 90);
+		g.drawString("Score: " + gc.getGameGrade(), 900, 90);
 		if (!gc.getGame().isRunning()) {
 			g.setColor(Color.ORANGE);
 			g.setFont(new Font("Arial", 1, 50));
