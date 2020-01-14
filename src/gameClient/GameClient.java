@@ -2,6 +2,9 @@ package gameClient;
 
 import java.util.List;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import Server.Game_Server;
 import Server.game_service;
 import dataStructure.DGraph;
@@ -19,7 +22,7 @@ public class GameClient implements Runnable {
 	public GameClient() {
 	}
 
-	public void initGame(int stage) {
+	public GameClient(int stage) {
 		game = Game_Server.getServer(stage);
 		g = new DGraph();
 		g.initFromJson(game.getGraph());
@@ -40,9 +43,23 @@ public class GameClient implements Runnable {
 	public graph getGraph() {
 		return this.g;
 	}
-	
+
 	public game_service getGame() {
 		return this.game;
+	}
+
+	public String getGameGrade() {
+		String results = game.toString();
+		JSONObject line;
+		String grade = "0";
+		try {
+			line = new JSONObject(results);
+			JSONObject gs = line.getJSONObject("GameServer");
+			grade = "" + gs.getInt("grade");
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return grade;
 	}
 
 	public List<String> getGameRobots() {
@@ -56,12 +73,14 @@ public class GameClient implements Runnable {
 		long dt = 50;
 		while (game.isRunning()) {
 			if (!isManual) {
+//				game_algo.moveRobotsAuto(game, g);
 				game_algo.moveRobots(g, game);
 			}
 			game_algo.updateRobots(game);
 			game_algo.initFruitsOnEdges(g, game);
 			try {
 				if (ind % 2 == 0) {
+
 					game.move();
 					g.upgradeMC();
 				}
@@ -72,6 +91,7 @@ public class GameClient implements Runnable {
 				e.printStackTrace();
 			}
 		}
+		g.upgradeMC();
 	}
 
 	public void setIsManual(boolean isManual) {

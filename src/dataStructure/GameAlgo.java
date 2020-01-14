@@ -26,7 +26,7 @@ public class GameAlgo {
 	public void initRobotsOnNodes(graph g, game_service game) {
 		if (g == null)
 			throw new RuntimeException("Please fill graph first");
-		
+
 		String info = game.toString();
 		JSONObject line;
 		try {
@@ -140,6 +140,18 @@ public class GameAlgo {
 		if (g.getEdge(r.getSrc(), dest) == null)
 			throw new RuntimeException("There is no edge between src: " + r.getSrc() + " dest: " + dest);
 		game.chooseNextEdge(id, dest);
+	}
+
+	public void moveRobotsAuto(game_service game, graph g) {
+		Robot r = getRobotById(0);
+		if (r.getDest() == -1)
+			game.chooseNextEdge(0, 4);
+		if (r.getDest() == 4)
+			game.chooseNextEdge(0, 5);
+		if (r.getDest() == 5)
+			game.chooseNextEdge(0, 6);
+		if (r.getDest() == 6)
+			game.chooseNextEdge(0, 7);
 	}
 
 	public void moveRobots(graph g, game_service game) {

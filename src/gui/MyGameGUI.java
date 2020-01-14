@@ -1,42 +1,30 @@
 package gui;
 
 import java.awt.Color;
-import java.awt.FileDialog;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Menu;
 import java.awt.MenuBar;
 import java.awt.MenuItem;
-import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.Arc2D;
-import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
-import algorithms.Graph_Algo;
-import dataStructure.DGraph;
 import dataStructure.Fruit;
 import dataStructure.GameAlgo;
-import dataStructure.Node;
 import dataStructure.Robot;
 import dataStructure.edge_data;
 import dataStructure.graph;
@@ -52,7 +40,7 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 	private int MOVE_ROBOT_ID = -1;
 	private int MOVE_TO_DEST = -1;
 
-	private static final String STAGE = "Stage";
+	private static final String GAME = "Game";
 	private final int WIDTH = 1000;
 	private final int HEIGHT = 1000;
 	private final int X_SCALE_TMIN = 15;
@@ -68,7 +56,8 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 	}
 
 	private void initStage(int stage) {
-		gc.initGame(stage);
+		gc = new GameClient(stage);
+
 		this.ga = gc.getGameAlgo();
 		this.mc = this.getG().getMC();
 	}
@@ -105,18 +94,20 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 		this.setVisible(true);
 		this.initMenuBar();
 		this.initMcThread();
+
+		chooseStagePopup();
 	}
 
 	private void initMenuBar() {
 		MenuBar menuBar = new MenuBar();
-		Menu load = new Menu("Load");
-		menuBar.add(load);
+		Menu menu1 = new Menu("New");
+		menuBar.add(menu1);
 		this.setMenuBar(menuBar);
 
-		MenuItem stage = new MenuItem(STAGE);
-		stage.addActionListener(this);
+		MenuItem game = new MenuItem(GAME);
+		game.addActionListener(this);
 
-		load.add(stage);
+		menu1.add(game);
 
 		this.addMouseListener(this);
 
@@ -134,7 +125,10 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 				g2d.setBackground(new Color(240, 240, 240));
 				g2d.clearRect(0, 0, this.WIDTH, this.HEIGHT);
 				// paint using g2d ...
+				this.drawGameInfo(g2d);
 				this.drawGraph(g2d);
+				this.drawFruits(g2d);
+				this.drawRobots(g2d);
 				Graphics2D g2dComponent = (Graphics2D) g;
 				g2dComponent.drawImage(bufferedImage, null, 0, 0);
 			}
@@ -212,13 +206,7 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 	private void drawGraph(Graphics2D g) {
 		setGuiLocations();
 
-		g.setColor(Color.RED);
 		g.setFont(new Font("Arial", 1, 15));
-		List<String> rob = gc.getGameRobots();
-		for (int i = 1; i <= rob.size(); i++) {
-			g.drawString(rob.get(i - 1), 100, 70 + (20 * i));
-		}
-		g.drawString("Time left: " + gc.getGameClock(), 900, 100);
 		for (node_data src : this.getG().getV()) {
 			Point3D pSrc = src.getGuiLocation();
 			g.setColor(Color.BLUE);
@@ -247,6 +235,10 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 				}
 			}
 		}
+
+	}
+
+	private void drawFruits(Graphics2D g) {
 		synchronized (ga.fruitList()) {
 			for (Fruit f : ga.fruitList()) {
 				Point3D pFruit = f.getGuiLocation();
@@ -261,6 +253,9 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 
 			}
 		}
+	}
+
+	private void drawRobots(Graphics2D g) {
 		synchronized (ga.robotList()) {
 			for (Robot r : ga.robotList()) {
 				BufferedImage img;
@@ -275,7 +270,27 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 
 			}
 		}
+	}
 
+	private void drawGameInfo(Graphics2D g) {
+
+		g.setColor(Color.RED);
+		g.setFont(new Font("Arial", 1, 15));
+		List<String> rob = gc.getGameRobots();
+		for (int i = 0; i < rob.size(); i++) {
+			g.drawString(rob.get(i), 130, 100 + (20 * i));
+		}
+
+		g.setColor(Color.BLUE);
+		g.setFont(new Font("Arial", 1, 17));
+		if (gc.getGame().isRunning())
+			g.drawString("Time left: " + gc.getGameClock(), 30, 70);
+		g.drawString("Score: " + gc.getGameGrade(), 900, 70);
+		if (!gc.getGame().isRunning()) {
+			g.setColor(Color.ORANGE);
+			g.setFont(new Font("Arial", 1, 50));
+			g.drawString("Game Over!", 300, 500);
+		}
 	}
 
 	private double[] xAxis_Min_Max(graph g) {
@@ -383,29 +398,33 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 	public void actionPerformed(ActionEvent e) {
 		String str = e.getActionCommand();
 		switch (str) {
-		case STAGE: {
-			String s = JOptionPane.showInputDialog("Please insert number of stage between 0-23");
-			int stage;
-			try {
-				stage = Integer.parseInt(s);
-				this.initStage(stage);
-				repaint();
-				int reply = JOptionPane.showConfirmDialog(null, "You want to run manually?", "Choose mode",
-						JOptionPane.YES_NO_OPTION);
-				if (reply == JOptionPane.YES_OPTION) {
-					gc.setIsManual(true);
-				} else {
-					gc.setIsManual(false);
-				}
-				Thread t = new Thread(gc);
-				t.start();
-
-			} catch (Exception ex) {
-				JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
-			}
+		case GAME: {
+			chooseStagePopup();
 			break;
 		}
 
+		}
+	}
+
+	private void chooseStagePopup() {
+		String s = JOptionPane.showInputDialog("Please insert number of stage between 0-23");
+		int stage;
+		try {
+			stage = Integer.parseInt(s);
+			this.initStage(stage);
+			repaint();
+			int reply = JOptionPane.showConfirmDialog(null, "You want to run manually?", "Choose mode",
+					JOptionPane.YES_NO_OPTION);
+			if (reply == JOptionPane.YES_OPTION) {
+				gc.setIsManual(true);
+			} else {
+				gc.setIsManual(false);
+			}
+			Thread t = new Thread(gc);
+			t.start();
+
+		} catch (Exception ex) {
+			JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
