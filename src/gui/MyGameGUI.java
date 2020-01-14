@@ -55,9 +55,13 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 		initGUI(WIDTH, HEIGHT);
 	}
 
+	/**
+	 * Function to init new game by stage
+	 * 
+	 * @param stage
+	 */
 	private void initStage(int stage) {
 		gc = new GameClient(stage);
-
 		this.ga = gc.getGameAlgo();
 		this.mc = this.getG().getMC();
 	}
@@ -98,6 +102,9 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 		chooseStagePopup();
 	}
 
+	/**
+	 * Function to init menu bar of the window
+	 */
 	private void initMenuBar() {
 		MenuBar menuBar = new MenuBar();
 		Menu menu1 = new Menu("New");
@@ -159,6 +166,9 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 		t.start();
 	}
 
+	/**
+	 * Function that scale the locations of nodes,robots and fruits
+	 */
 	private void setGuiLocations() {
 		graph g = this.gc.getGraph();
 		double x_scale[] = xAxis_Min_Max(g);
@@ -238,6 +248,11 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 
 	}
 
+	/**
+	 * Function to draw fruits
+	 * 
+	 * @param g
+	 */
 	private void drawFruits(Graphics2D g) {
 		synchronized (ga.fruitList()) {
 			for (Fruit f : ga.fruitList()) {
@@ -255,6 +270,11 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 		}
 	}
 
+	/**
+	 * Function to draw robots
+	 * 
+	 * @param g
+	 */
 	private void drawRobots(Graphics2D g) {
 		synchronized (ga.robotList()) {
 			for (Robot r : ga.robotList()) {
@@ -272,6 +292,11 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 		}
 	}
 
+	/**
+	 * Function to draw game info like time , score and game over
+	 * 
+	 * @param g
+	 */
 	private void drawGameInfo(Graphics2D g) {
 
 		g.setColor(Color.RED);
@@ -293,6 +318,12 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 		}
 	}
 
+	/**
+	 * Function to get min and max of xAxis , used on scale function
+	 * 
+	 * @param g
+	 * @return
+	 */
 	private double[] xAxis_Min_Max(graph g) {
 		double arr[] = { Double.MAX_VALUE, Double.MIN_VALUE }; // min [0] max [1]
 		for (node_data n : g.getV()) {
@@ -306,6 +337,12 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 		return arr;
 	}
 
+	/**
+	 * Function to get min and max of yAxis , used on scale function
+	 * 
+	 * @param g
+	 * @return
+	 */
 	private double[] yAxis_Min_Max(graph g) {
 		double arr[] = { Double.MAX_VALUE, Double.MIN_VALUE }; // min [0] max [1]
 		for (node_data n : g.getV()) {
@@ -327,6 +364,16 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 
 	@Override
 	public void mousePressed(MouseEvent e) {
+		moveRobotByClicking(e);
+	}
+
+	/**
+	 * Function to move robot by clicking the nodes and robots 2 clicks - choose
+	 * robot 1 click - tell the robot to move this node
+	 * 
+	 * @param e
+	 */
+	private void moveRobotByClicking(MouseEvent e) {
 		if (gc.IsManual()) {
 			int x = e.getX();
 			int y = e.getY();
@@ -340,8 +387,6 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 						MOVE_TO_DEST = -1;
 					} catch (Exception ex) {
 						System.out.println(ex);
-//						JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage(), "ERROR",
-//								JOptionPane.ERROR_MESSAGE);
 					}
 				}
 			}
@@ -354,6 +399,12 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 		}
 	}
 
+	/**
+	 * Function to find node by location
+	 * 
+	 * @param p
+	 * @return
+	 */
 	private node_data findNodeByLocation(Point3D p) {
 		for (node_data node : gc.getGraph().getV()) {
 			double distance = node.getGuiLocation().distance2D(p);
@@ -363,6 +414,12 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 		return null;
 	}
 
+	/**
+	 * Function to find robot by location
+	 * 
+	 * @param p
+	 * @return
+	 */
 	private Robot findRobotByLocation(Point3D p) {
 		for (Robot robot : ga.robotList()) {
 			double distance = robot.getGuiLocation().distance2D(p);
@@ -406,6 +463,11 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 		}
 	}
 
+	/**
+	 * Function that ask from user to enter stage , this function repaint the graph
+	 * with the selected stage After that , create thread of game client , and call
+	 * thread.start to start game
+	 */
 	private void chooseStagePopup() {
 		String s = JOptionPane.showInputDialog("Please insert number of stage between 0-23");
 		int stage;
@@ -428,6 +490,16 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 		}
 	}
 
+	/**
+	 * Function scale some point
+	 * 
+	 * @param data
+	 * @param r_min
+	 * @param r_max
+	 * @param t_min
+	 * @param t_max
+	 * @return
+	 */
 	private double scale(double data, double r_min, double r_max, double t_min, double t_max) {
 		double res = ((data - r_min) / (r_max - r_min)) * (t_max - t_min) + t_min;
 		return res;

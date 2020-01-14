@@ -21,11 +21,21 @@ public class GameAlgo {
 
 	public static final double EPS = 0.000001;
 
+	/**
+	 * Empty constructor , init lists
+	 */
 	public GameAlgo() {
 		fruitList = new ArrayList<>();
 		robotList = new ArrayList<>();
 	}
 
+	/**
+	 * Function to init robots on the nodes of the graph The robots come from game
+	 * json
+	 * 
+	 * @param g
+	 * @param game
+	 */
 	public void initRobotsOnNodes(graph g, game_service game) {
 		if (g == null)
 			throw new RuntimeException("Please fill graph first");
@@ -51,6 +61,13 @@ public class GameAlgo {
 
 	}
 
+	/**
+	 * Function to init fruits on edges in the graph by position The fruits come
+	 * from game json
+	 * 
+	 * @param g
+	 * @param game
+	 */
 	public void initFruitsOnEdges(graph g, game_service game) {
 		if (g == null)
 			throw new RuntimeException("Please fill graph first");
@@ -77,6 +94,14 @@ public class GameAlgo {
 		}
 	}
 
+	/**
+	 * Function to check if the fruit is on edge based on position and fruit type
+	 * 
+	 * @param e
+	 * @param f
+	 * @param g
+	 * @return
+	 */
 	private boolean isFruitOnEdge(edge_data e, Fruit f, graph g) {
 		boolean ans = false;
 		int src = e.getSrc();
@@ -99,6 +124,11 @@ public class GameAlgo {
 		return ans;
 	}
 
+	/**
+	 * Function to update robots from the game
+	 * 
+	 * @param game
+	 */
 	public void updateRobots(game_service game) {
 		robotList = new ArrayList<>();
 		synchronized (robotList) {
@@ -110,26 +140,57 @@ public class GameAlgo {
 
 	}
 
+	/**
+	 * Function to add fruit to the list
+	 * 
+	 * @param f
+	 */
 	private void addFruit(Fruit f) {
 		this.fruitList.add(f);
 	}
 
+	/**
+	 * Function to get list of the fruits
+	 * 
+	 * @return
+	 */
 	public ArrayList<Fruit> fruitList() {
 		return this.fruitList;
 	}
 
+	/**
+	 * Function to sort fruitList with fruit comparator
+	 * 
+	 * @param comp
+	 */
 	private void sortFruits(Comparator<Fruit> comp) {
 		this.fruitList.sort(comp);
 	}
 
+	/**
+	 * Function to add robot to the list
+	 * 
+	 * @param r
+	 */
 	private void addRobot(Robot r) {
 		this.robotList.add(r);
 	}
 
+	/**
+	 * Function to get list of the robots
+	 * 
+	 * @return
+	 */
 	public ArrayList<Robot> robotList() {
 		return this.robotList;
 	}
 
+	/**
+	 * Function to get robot by id
+	 * 
+	 * @param id
+	 * @return
+	 */
 	public Robot getRobotById(int id) {
 		for (Robot robot : robotList) {
 			if (robot.getId() == id)
@@ -138,6 +199,14 @@ public class GameAlgo {
 		return null;
 	}
 
+	/**
+	 * Function to move robot (use on manually)
+	 * 
+	 * @param id
+	 * @param dest
+	 * @param game
+	 * @param g
+	 */
 	public void moveRobot(int id, int dest, game_service game, graph g) {
 		Robot r = getRobotById(id);
 		if (r == null)
@@ -147,6 +216,12 @@ public class GameAlgo {
 		game.chooseNextEdge(id, dest);
 	}
 
+	/**
+	 * Function to move robots with auto algorithm
+	 * 
+	 * @param game
+	 * @param g
+	 */
 	public void moveRobotsAuto(game_service game, graph g) {
 		graph_algo.init(g);
 		synchronized (robotList) {
@@ -191,6 +266,13 @@ public class GameAlgo {
 		}
 	}
 
+	/**
+	 * Function to choose next edge by game server function
+	 * 
+	 * @param rid
+	 * @param path
+	 * @param game
+	 */
 	public void moveByPath(int rid, List<node_data> path, game_service game) {
 		for (int i = 1; i < path.size(); i++) {
 			node_data n = path.get(i);

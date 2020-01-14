@@ -190,6 +190,9 @@ public class DGraph implements graph, Serializable {
 		return this.mc;
 	}
 	
+	/**
+	 * Function to upload mc in 1
+	 */
 	public void upgradeMC() {
 		this.mc++;
 	}
@@ -230,6 +233,15 @@ public class DGraph implements graph, Serializable {
 		return new DGraph(this);
 	}
 
+	
+	/**
+	 * Function that get json in the format:
+	 * {
+	 * 		Nodes:[{"pos":"","id":""}],
+	 * 		Edges:[{"src":"","dest":"","w":""}]
+	 * }
+	 * and create DGraph
+	 */
 	public void initFromJson(String graph) {
 		JSONObject line;
 		try {

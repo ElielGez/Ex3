@@ -1,7 +1,5 @@
 package dataStructure;
 
-import java.util.Comparator;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -20,6 +18,19 @@ public class Robot {
 
 	}
 
+	/**
+	 * Constructor to create robot from json
+	 * json format:
+	 * 		"Robot":{
+	 * 			"pos":"",
+	 * 			"value":"",
+	 * 			"id":"",
+	 * 			"src":"",
+	 * 			"dest":"",
+	 * 			"speed":""
+	 * 		}
+	 * @param json
+	 */
 	public Robot(String json) {
 		JSONObject line;
 		try {
@@ -38,37 +49,56 @@ public class Robot {
 		}
 	}
 
-	public Robot(Robot f) {
-		this.value = f.getValue();
-		this.location = f.getLocation();
-		this.guiLocation = f.getGuiLocation();
-	}
-
+	/**
+	 * Getter for value
+	 * @return
+	 */
 	public double getValue() {
 		return value;
 	}
 
+	/**
+	 * Setter for value
+	 * @param value
+	 */
 	public void setValue(double value) {
 		this.value = value;
 	}
 
+	/**
+	 * Getter for location
+	 * @return
+	 */
 	public Point3D getLocation() {
 		return location;
 	}
 
+	/**
+	 * Setter for location
+	 * @param location
+	 */
 	public void setLocation(Point3D location) {
 		this.location = new Point3D(location);
 	}
 
+	/**
+	 * Getter for gui location
+	 * @return
+	 */
 	public Point3D getGuiLocation() {
 		return guiLocation;
 	}
 
+	/**
+	 * Setter for gui location
+	 * @param guiLocation
+	 */
 	public void setGuiLocation(Point3D guiLocation) {
 		this.guiLocation = new Point3D(guiLocation);
 	}
 
 	/**
+	 * Getter for src
 	 * @return the src
 	 */
 	public int getSrc() {
@@ -76,6 +106,7 @@ public class Robot {
 	}
 
 	/**
+	 * Setter for src
 	 * @param src the src to set
 	 */
 	public void setSrc(int src) {
@@ -83,6 +114,7 @@ public class Robot {
 	}
 
 	/**
+	 * Getter for id
 	 * @return the id
 	 */
 	public int getId() {
@@ -90,6 +122,7 @@ public class Robot {
 	}
 
 	/**
+	 * Getter for dest
 	 * @return the dest
 	 */
 	public int getDest() {
@@ -97,6 +130,7 @@ public class Robot {
 	}
 
 	/**
+	 * Setter for dest
 	 * @param dest the dest to set
 	 */
 	public void setDest(int dest) {
@@ -104,6 +138,7 @@ public class Robot {
 	}
 
 	/**
+	 * Getter for speed
 	 * @return the speed
 	 */
 	public double getSpeed() {
@@ -111,6 +146,7 @@ public class Robot {
 	}
 
 	/**
+	 * Setter for speed
 	 * @param speed the speed to set
 	 */
 	public void setSpeed(double speed) {

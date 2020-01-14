@@ -107,7 +107,15 @@ public interface graph {
 	 */
 	public int getMC();
 
+	/**
+	 * Function to upload mc in 1
+	 */
 	public void upgradeMC();
-	
+
+	/**
+	 * Function to init graph from json
+	 * 
+	 * @param graph
+	 */
 	public void initFromJson(String graph);
 }

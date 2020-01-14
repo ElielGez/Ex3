@@ -22,6 +22,11 @@ public class GameClient implements Runnable {
 	public GameClient() {
 	}
 
+	/**
+	 * Constructor to create game client with stage
+	 * 
+	 * @param stage
+	 */
 	public GameClient(int stage) {
 		game = Game_Server.getServer(stage);
 		g = new DGraph();
@@ -32,22 +37,47 @@ public class GameClient implements Runnable {
 		game_algo.initRobotsOnNodes(g, game);
 	}
 
+	/**
+	 * Getter for game_algo
+	 * 
+	 * @return
+	 */
 	public GameAlgo getGameAlgo() {
 		return this.game_algo;
 	}
 
+	/**
+	 * Getter for game clock
+	 * 
+	 * @return
+	 */
 	public long getGameClock() {
 		return (game.timeToEnd() / 1000);
 	}
 
+	/**
+	 * Getter for graph
+	 * 
+	 * @return
+	 */
 	public graph getGraph() {
 		return this.g;
 	}
 
+	/**
+	 * Getter for game
+	 * 
+	 * @return
+	 */
 	public game_service getGame() {
 		return this.game;
 	}
 
+	/**
+	 * Getter for game grade from json
+	 * 
+	 * @return
+	 */
 	public String getGameGrade() {
 		String results = game.toString();
 		JSONObject line;
@@ -62,10 +92,19 @@ public class GameClient implements Runnable {
 		return grade;
 	}
 
+	/**
+	 * Getter for game robots
+	 * 
+	 * @return
+	 */
 	public List<String> getGameRobots() {
 		return game.getRobots();
 	}
 
+	/**
+	 * Override function of runnable , this function run the game on thread and
+	 * moving every even number the robots
+	 */
 	@Override
 	public void run() {
 		try {
@@ -92,10 +131,20 @@ public class GameClient implements Runnable {
 		}
 	}
 
+	/**
+	 * Setter for manual
+	 * 
+	 * @param isManual
+	 */
 	public void setIsManual(boolean isManual) {
 		this.isManual = isManual;
 	}
 
+	/**
+	 * Getter for manual
+	 * 
+	 * @return
+	 */
 	public boolean IsManual() {
 		return this.isManual;
 	}
