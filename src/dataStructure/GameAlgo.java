@@ -182,11 +182,11 @@ public class GameAlgo {
 						i++;
 					}
 					if (i == fruitList.size()) {
-						found = false;
+						found = true;
 						continue;
 					}
-
 				}
+				i++;
 			}
 		}
 	}
@@ -196,50 +196,5 @@ public class GameAlgo {
 			node_data n = path.get(i);
 			game.chooseNextEdge(rid, n.getKey());
 		}
-	}
-
-	public void moveRobots(graph g, game_service game) {
-		long t = game.timeToEnd();
-		List<String> robots = game.getRobots();
-		for (String robot_json : robots) {
-			try {
-				JSONObject line = new JSONObject(robot_json);
-				JSONObject ttt = line.getJSONObject("Robot");
-				int rid = ttt.getInt("id");
-				int src = ttt.getInt("src");
-				int dest = ttt.getInt("dest");
-
-				if (dest == -1) {
-					dest = nextNode(g, src);
-					game.chooseNextEdge(rid, dest);
-//						System.out.println("Turn to node: " + dest + "  time to end:" + (t / 1000));
-//						System.out.println(ttt);
-				}
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
-	/**
-	 * a very simple random walk implementation!
-	 * 
-	 * @param g
-	 * @param src
-	 * @return
-	 */
-	private static int nextNode(graph g, int src) {
-		int ans = -1;
-		Collection<edge_data> ee = g.getE(src);
-		Iterator<edge_data> itr = ee.iterator();
-		int s = ee.size();
-		int r = (int) (Math.random() * s);
-		int i = 0;
-		while (i < r) {
-			itr.next();
-			i++;
-		}
-		ans = itr.next().getDest();
-		return ans;
 	}
 }

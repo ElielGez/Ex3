@@ -75,7 +75,6 @@ public class GameClient implements Runnable {
 			while (game.isRunning()) {
 				if (!isManual) {
 					game_algo.moveRobotsAuto(game, g);
-//				game_algo.moveRobots(g, game);
 				}
 				game_algo.updateRobots(game);
 				game_algo.initFruitsOnEdges(g, game);
