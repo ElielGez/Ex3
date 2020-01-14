@@ -35,6 +35,7 @@ import javax.swing.JOptionPane;
 import algorithms.Graph_Algo;
 import dataStructure.DGraph;
 import dataStructure.Fruit;
+import dataStructure.GameAlgo;
 import dataStructure.Node;
 import dataStructure.Robot;
 import dataStructure.edge_data;
@@ -45,8 +46,8 @@ import utils.Point3D;
 
 public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 	private GameClient gc;
+	private GameAlgo ga;
 	private int mc;
-	private Graph_Algo ga = new Graph_Algo();
 
 	private int MOVE_ROBOT_ID = -1;
 	private int MOVE_TO_DEST = -1;
@@ -68,6 +69,7 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 
 	private void initStage(int stage) {
 		gc.initGame(stage);
+		this.ga = gc.getGameAlgo();
 		this.mc = this.getG().getMC();
 	}
 
@@ -177,9 +179,9 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 			n.setGuiLocation(p);
 		}
 
-		synchronized (gc.fruitList()) {
+		synchronized (ga.fruitList()) {
 			// fruit set gui location
-			for (Fruit f : gc.fruitList()) {
+			for (Fruit f : ga.fruitList()) {
 				double xF = scale(f.getLocation().x(), x_scale[0], x_scale[1], X_SCALE_TMIN,
 						this.getWidth() - Y_SCALE_TMAX);
 				double yF = scale(f.getLocation().y(), y_scale[1], y_scale[0], Y_SCALE_TMIN,
@@ -189,9 +191,9 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 			}
 		}
 
-		synchronized (gc.robotList()) {
+		synchronized (ga.robotList()) {
 			// robot set gui location
-			for (Robot r : gc.robotList()) {
+			for (Robot r : ga.robotList()) {
 				double xR = scale(r.getLocation().x(), x_scale[0], x_scale[1], X_SCALE_TMIN,
 						this.getWidth() - Y_SCALE_TMAX);
 				double yR = scale(r.getLocation().y(), y_scale[1], y_scale[0], Y_SCALE_TMIN,
@@ -245,8 +247,8 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 				}
 			}
 		}
-		synchronized (gc.fruitList()) {
-			for (Fruit f : gc.fruitList()) {
+		synchronized (ga.fruitList()) {
+			for (Fruit f : ga.fruitList()) {
 				Point3D pFruit = f.getGuiLocation();
 				if (f.getType() == -1)
 					g.setColor(new Color(255, 196, 30)); // banana
@@ -259,8 +261,8 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 
 			}
 		}
-		synchronized (gc.robotList()) {
-			for (Robot r : gc.robotList()) {
+		synchronized (ga.robotList()) {
+			for (Robot r : ga.robotList()) {
 				BufferedImage img;
 				try {
 					img = ImageIO.read(new File("./images/robot.png"));
@@ -319,7 +321,7 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 				if (n != null) {
 					MOVE_TO_DEST = n.getKey();
 					try {
-						gc.moveRobot(MOVE_ROBOT_ID, MOVE_TO_DEST);
+						ga.moveRobot(MOVE_ROBOT_ID, MOVE_TO_DEST, gc.getGame(), getG());
 						MOVE_TO_DEST = -1;
 					} catch (Exception ex) {
 						System.out.println(ex);
@@ -347,7 +349,7 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 	}
 
 	private Robot findRobotByLocation(Point3D p) {
-		for (Robot robot : gc.robotList()) {
+		for (Robot robot : ga.robotList()) {
 			double distance = robot.getGuiLocation().distance2D(p);
 			if (distance >= 0 && distance <= 25)
 				return robot;
