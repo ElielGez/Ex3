@@ -13,6 +13,7 @@ public class Fruit {
 	private Point3D location;
 	private Point3D guiLocation;
 	private edge_data edge;
+	private boolean onTarget;
 	public static final Comparator<Fruit> comp = new Fruit_Comperator();
 
 	public Fruit() {
@@ -29,6 +30,7 @@ public class Fruit {
 			this.setLocation(p);
 			this.setValue(fruit.getDouble("value"));
 			this.setType(fruit.getInt("type"));
+			this.setOnTarget(false);
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
@@ -91,5 +93,19 @@ public class Fruit {
 	 */
 	public void setEdge(edge_data edge) {
 		this.edge = edge;
+	}
+
+	/**
+	 * @return the onTarget
+	 */
+	public boolean isOnTarget() {
+		return onTarget;
+	}
+
+	/**
+	 * @param onTarget the onTarget to set
+	 */
+	public void setOnTarget(boolean onTarget) {
+		this.onTarget = onTarget;
 	}
 }

@@ -68,30 +68,29 @@ public class GameClient implements Runnable {
 
 	@Override
 	public void run() {
-		game.startGame();
-		int ind = 0;
-		long dt = 50;
-		while (game.isRunning()) {
-			if (!isManual) {
-//				game_algo.moveRobotsAuto(game, g);
-				game_algo.moveRobots(g, game);
-			}
-			game_algo.updateRobots(game);
-			game_algo.initFruitsOnEdges(g, game);
-			try {
-				if (ind % 2 == 0) {
+		try {
+			game.startGame();
+			int ind = 0;
+			long dt = 50;
+			while (game.isRunning()) {
+				if (!isManual) {
+					game_algo.moveRobotsAuto(game, g);
+//				game_algo.moveRobots(g, game);
+				}
+				game_algo.updateRobots(game);
+				game_algo.initFruitsOnEdges(g, game);
 
+				if (ind % 2 == 0) {
 					game.move();
 					g.upgradeMC();
 				}
 				Thread.sleep(dt);
 				ind++;
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
+			g.upgradeMC();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		g.upgradeMC();
 	}
 
 	public void setIsManual(boolean isManual) {

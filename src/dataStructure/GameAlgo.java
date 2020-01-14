@@ -10,11 +10,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import Server.game_service;
+import algorithms.Graph_Algo;
+import algorithms.graph_algorithms;
 import utils.Point3D;
 
 public class GameAlgo {
 	private ArrayList<Fruit> fruitList;
 	private ArrayList<Robot> robotList;
+	private graph_algorithms graph_algo = new Graph_Algo();
 
 	public static final double EPS = 0.000001;
 
@@ -78,6 +81,8 @@ public class GameAlgo {
 		boolean ans = false;
 		int src = e.getSrc();
 		int dest = e.getDest();
+		if (fruitList.contains(f))
+			return false;
 		if (f.getType() < 0 && dest > src)
 			return false;
 		if (f.getType() > 0 && src > dest)
@@ -143,15 +148,62 @@ public class GameAlgo {
 	}
 
 	public void moveRobotsAuto(game_service game, graph g) {
-		Robot r = getRobotById(0);
-		if (r.getDest() == -1)
-			game.chooseNextEdge(0, 4);
-		if (r.getDest() == 4)
-			game.chooseNextEdge(0, 5);
-		if (r.getDest() == 5)
-			game.chooseNextEdge(0, 6);
-		if (r.getDest() == 6)
-			game.chooseNextEdge(0, 7);
+		graph_algo.init(g);
+		synchronized (fruitList) {
+			for (Fruit f : fruitList) {
+				if (f.isOnTarget())
+					continue;
+				edge_data e = f.getEdge();
+				synchronized (robotList) {
+					for (Robot r : robotList) {
+						int dest = -1;
+						if (f.getType() == -1) {
+							if (e.getDest() > e.getSrc())
+								dest = e.getSrc();
+							else
+								dest = e.getDest();
+							List<node_data> shortestPath = graph_algo.shortestPath(r.getSrc(), dest);
+							if (shortestPath != null && shortestPath.size() > 1) {
+								moveByPath(r.getId(), shortestPath, game);
+								f.setOnTarget(true);
+							}
+						} else if (f.getType() == 1) {
+							if (e.getDest() > e.getSrc())
+								dest = e.getDest();
+							else
+								dest = e.getSrc();
+							List<node_data> shortestPath = graph_algo.shortestPath(r.getSrc(), dest);
+							if (shortestPath != null && shortestPath.size() > 1) {
+								moveByPath(r.getId(), shortestPath, game);
+								f.setOnTarget(true);
+							}
+						}
+
+					}
+				}
+			}
+		}
+
+	}
+
+	public void moveByPath(int rid, List<node_data> path, game_service game) {
+		Robot r = getRobotById(rid);
+		int prev = -1;
+		for (int i = 1; i < path.size(); i++) {
+			node_data n = path.get(i);
+			if (r.getDest() == prev) {
+				game.chooseNextEdge(rid, n.getKey());
+				prev = n.getKey();
+			}
+		}
+//		if (r.getDest() == -1)
+//			game.chooseNextEdge(0, 4);
+//		if (r.getDest() == 4)
+//			game.chooseNextEdge(0, 5);
+//		if (r.getDest() == 5)
+//			game.chooseNextEdge(0, 6);
+//		if (r.getDest() == 6)
+//			game.chooseNextEdge(0, 7);
 	}
 
 	public void moveRobots(graph g, game_service game) {
