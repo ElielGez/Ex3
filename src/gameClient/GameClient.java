@@ -10,6 +10,7 @@ import Server.game_service;
 import dataStructure.DGraph;
 import dataStructure.GameAlgo;
 import dataStructure.graph;
+import dataStructure.node_data;
 
 public class GameClient implements Runnable {
 	private boolean isManual;
@@ -29,14 +30,16 @@ public class GameClient implements Runnable {
 	 * @param stage
 	 */
 	public GameClient(int stage) {
-		log = new KML_Logger(stage, "moshe");
+		log = new KML_Logger(stage);
 		game = Game_Server.getServer(stage);
 		g = new DGraph();
-		g.initFromJson(game.getGraph());
-		game_algo = new GameAlgo();
 
-		game_algo.initFruitsOnEdges(g, game);
-		game_algo.initRobotsOnNodes(g, game);
+		g.initFromJson(game.getGraph());
+		initNodesLog();
+
+		game_algo = new GameAlgo();
+		game_algo.initFruitsOnEdges(g, game, log);
+		game_algo.initRobotsOnNodes(g, game, log);
 	}
 
 	/**
@@ -102,9 +105,15 @@ public class GameClient implements Runnable {
 	public List<String> getGameRobots() {
 		return game.getRobots();
 	}
-	
+
 	public KML_Logger getKMLog() {
 		return this.log;
+	}
+
+	private void initNodesLog() {
+		for (node_data n : this.g.getV()) {
+			this.log.addNodePlaceMark("" + n.getLocation());
+		}
 	}
 
 	/**
@@ -121,8 +130,8 @@ public class GameClient implements Runnable {
 				if (!isManual) {
 					game_algo.moveRobotsAuto(game, g);
 				}
-				game_algo.updateRobots(game);
-				game_algo.initFruitsOnEdges(g, game);
+				game_algo.updateRobots(game, log);
+				game_algo.initFruitsOnEdges(g, game, log);
 
 				if (ind % 2 == 0) {
 					game.move();
@@ -132,8 +141,8 @@ public class GameClient implements Runnable {
 				ind++;
 			}
 			g.upgradeMC();
+			log.closeDocument();
 			System.out.println(game.toString());
-//			log.closeDocument();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

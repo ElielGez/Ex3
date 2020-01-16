@@ -12,6 +12,7 @@ import org.json.JSONObject;
 import Server.game_service;
 import algorithms.Graph_Algo;
 import algorithms.graph_algorithms;
+import gameClient.KML_Logger;
 import utils.Point3D;
 
 public class GameAlgo {
@@ -36,7 +37,7 @@ public class GameAlgo {
 	 * @param g
 	 * @param game
 	 */
-	public void initRobotsOnNodes(graph g, game_service game) {
+	public void initRobotsOnNodes(graph g, game_service game, KML_Logger log) {
 		if (g == null)
 			throw new RuntimeException("Please fill graph first");
 
@@ -53,7 +54,7 @@ public class GameAlgo {
 					game.addRobot(i);
 				}
 			}
-			this.updateRobots(game);
+			this.updateRobots(game, log);
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -68,7 +69,7 @@ public class GameAlgo {
 	 * @param g
 	 * @param game
 	 */
-	public void initFruitsOnEdges(graph g, game_service game) {
+	public void initFruitsOnEdges(graph g, game_service game, KML_Logger log) {
 		if (g == null)
 			throw new RuntimeException("Please fill graph first");
 		fruitList = new ArrayList<>();
@@ -77,6 +78,7 @@ public class GameAlgo {
 			while (f_iter.hasNext()) {
 				String next = f_iter.next();
 				Fruit f = new Fruit(next);
+				log.addPlaceMark(f.getType() == -1 ? "fruit-banana" : "fruit-apple", "" + f.getLocation());
 				for (node_data src : g.getV()) {
 					Collection<edge_data> e = g.getE(src.getKey());
 					if (e != null) {
@@ -129,12 +131,14 @@ public class GameAlgo {
 	 * 
 	 * @param game
 	 */
-	public void updateRobots(game_service game) {
+	public void updateRobots(game_service game, KML_Logger log) {
 		robotList = new ArrayList<>();
 		synchronized (robotList) {
 			List<String> robots = game.getRobots();
 			for (String string : robots) {
-				this.addRobot(new Robot(string));
+				Robot r = new Robot(string);
+				log.addPlaceMark("robot", "" + r.getLocation());
+				this.addRobot(r);
 			}
 		}
 

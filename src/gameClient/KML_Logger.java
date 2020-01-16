@@ -9,14 +9,14 @@ import java.time.format.DateTimeFormatter;
 public class KML_Logger {
 	private int stage;
 	private StringBuilder content;
-	public KML_Logger(int stage,String name) {
+	public KML_Logger(int stage) {
 		this.stage = stage;
 		content = new StringBuilder();
 		content.append(
 				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n" + 
 				"<kml xmlns=\"http://earth.google.com/kml/2.2\">\r\n" + 
 				"  <Document>\r\n" + 
-				"    <name>" + name + "</name>" +
+				"    <name>stage: " + stage + " maze of waze" + "</name>" +
 				"	 <Style id=\"node\">\r\n" + 
 				"      <IconStyle>\r\n" + 
 				"        <Icon>\r\n" + 
@@ -53,13 +53,11 @@ public class KML_Logger {
 	}
 	
 	public void addPlaceMark(String type,String pos) {
-		
-			DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");  
-			   LocalDateTime now = LocalDateTime.now();  
+			LocalDateTime now = LocalDateTime.now();  
 			content.append(
 					"    <Placemark>\r\n" + 
 					"      <TimeStamp>\r\n" + 
-					"        <when>" + dtf.format(now) + "</when>\r\n" + 
+					"        <when>" + now + "</when>\r\n" + 
 					"      </TimeStamp>\r\n" + 
 					"      <styleUrl>#" + type + "</styleUrl>\r\n" + 
 					"      <Point>\r\n" + 
@@ -81,7 +79,7 @@ public class KML_Logger {
 				);
 		try 
 		{
-			PrintWriter pw = new PrintWriter(new File(this.stage + ".kml")); // change to save on data folder , and remove from git kmls
+			PrintWriter pw = new PrintWriter(new File("data/" + this.stage + ".kml")); // change to save on data folder , and remove from git kmls
 			pw.write(content.toString());
 			pw.close();
 		} 

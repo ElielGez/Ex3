@@ -64,10 +64,6 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 		gc = new GameClient(stage);
 		this.ga = gc.getGameAlgo();
 		this.mc = this.getG().getMC();
-
-		for (node_data n : getG().getV()) {
-			gc.getKMLog().addNodePlaceMark("" + n.getLocation());
-		}
 	}
 
 	/**
@@ -271,7 +267,6 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 					g.fill(fruitCircle);
 					g.setColor(Color.DARK_GRAY);
 					g.drawString("" + f.getValue(), pFruit.ix(), pFruit.iy());
-//					gc.getKMLog().addPlaceMark(type == -1 ? "fruit-banana" : "fruit-apple", "" + f.getLocation());
 				}
 			}
 		}
@@ -291,7 +286,6 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 					Point3D pRobot = r.getGuiLocation();
 					if (pRobot != null) {
 						g.drawImage(img, pRobot.ix() - 15, pRobot.iy() - 15, null);
-//						gc.getKMLog().addPlaceMark("robot", "" + r.getLocation());
 					}
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
