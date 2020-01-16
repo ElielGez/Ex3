@@ -132,6 +132,7 @@ public class GameClient implements Runnable {
 				ind++;
 			}
 			g.upgradeMC();
+			System.out.println(game.toString());
 //			log.closeDocument();
 		} catch (Exception e) {
 			e.printStackTrace();
