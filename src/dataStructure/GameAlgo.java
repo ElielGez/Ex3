@@ -78,7 +78,7 @@ public class GameAlgo {
 			while (f_iter.hasNext()) {
 				String next = f_iter.next();
 				Fruit f = new Fruit(next);
-				log.addPlaceMark(f.getType() == -1 ? "fruit-banana" : "fruit-apple", "" + f.getLocation());
+				log.addFruitPlaceMark(f.getType() == -1 ? "banana" : "apple", "" + f.getLocation());
 				for (node_data src : g.getV()) {
 					Collection<edge_data> e = g.getE(src.getKey());
 					if (e != null) {
@@ -137,7 +137,7 @@ public class GameAlgo {
 			List<String> robots = game.getRobots();
 			for (String string : robots) {
 				Robot r = new Robot(string);
-				log.addPlaceMark("robot", "" + r.getLocation());
+				log.addRobotPlaceMark("" + r.getLocation());
 				this.addRobot(r);
 			}
 		}

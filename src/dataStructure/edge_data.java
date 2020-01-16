@@ -1,8 +1,6 @@
 package dataStructure;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Comparator;
 
 /**
  * This interface represents the set of operations applicable on a directional

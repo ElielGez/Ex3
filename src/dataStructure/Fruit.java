@@ -149,4 +149,8 @@ public class Fruit {
 	public void setOnTarget(boolean onTarget) {
 		this.onTarget = onTarget;
 	}
+
+	public String toString() {
+		return "value: " + value + ", type: " + type + ", location: " + location;
+	}
 }

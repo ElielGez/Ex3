@@ -1,13 +1,26 @@
 package Tests;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import gameClient.GameClient;
 
 public class GameClientTest {
 
 	public static void main(String[] args) {
-		GameClient gc = new GameClient(23);
-		Thread t = new Thread(gc);
-		t.start();
+		runAllStages();
+	}
+	
+	/**
+	 * Function that run all stages (auto mode) in thread pool
+	 */
+	private static void runAllStages() {
+		ExecutorService pool = Executors.newFixedThreadPool(24);
+		for (int i = 0; i < 24; i++) {
+			Runnable r = new GameClient(i);
+			pool.execute(r);
+		}
+		pool.shutdown();
 	}
 
 }

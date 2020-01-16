@@ -30,7 +30,7 @@ public class GameClient implements Runnable {
 	 * @param stage
 	 */
 	public GameClient(int stage) {
-		log = new KML_Logger(stage);
+		log = new KML_Logger("" + stage);
 		game = Game_Server.getServer(stage);
 		g = new DGraph();
 
@@ -79,22 +79,54 @@ public class GameClient implements Runnable {
 	}
 
 	/**
+	 * Getter for game server json
+	 * 
+	 * @return
+	 */
+	private JSONObject getGameServerJson() {
+		String results = game.toString();
+		JSONObject gs = null;
+		try {
+			JSONObject line = new JSONObject(results);
+			gs = line.getJSONObject("GameServer");
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return gs;
+	}
+
+	/**
 	 * Getter for game grade from json
 	 * 
 	 * @return
 	 */
 	public String getGameGrade() {
-		String results = game.toString();
-		JSONObject line;
 		String grade = "0";
+		JSONObject gs = getGameServerJson();
 		try {
-			line = new JSONObject(results);
-			JSONObject gs = line.getJSONObject("GameServer");
 			grade = "" + gs.getInt("grade");
 		} catch (JSONException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return grade;
+	}
+
+	/**
+	 * Getter for game grade from json
+	 * 
+	 * @return
+	 */
+	public int getGameMoves() {
+		int moves = 0;
+		JSONObject gs = getGameServerJson();
+		try {
+			moves = gs.getInt("moves");
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return moves;
 	}
 
 	/**

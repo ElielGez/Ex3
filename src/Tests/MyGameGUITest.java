@@ -1,10 +1,5 @@
 package Tests;
 
-import java.util.Iterator;
-
-import Server.Game_Server;
-import Server.game_service;
-import gameClient.GameClient;
 import gui.MyGameGUI;
 
 public class MyGameGUITest {
