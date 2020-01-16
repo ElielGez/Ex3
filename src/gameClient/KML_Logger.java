@@ -81,7 +81,7 @@ public class KML_Logger {
 				);
 		try 
 		{
-			PrintWriter pw = new PrintWriter(new File(this.stage + ".kml"));
+			PrintWriter pw = new PrintWriter(new File(this.stage + ".kml")); // change to save on data folder , and remove from git kmls
 			pw.write(content.toString());
 			pw.close();
 		} 

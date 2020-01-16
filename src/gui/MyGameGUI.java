@@ -271,7 +271,7 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 					g.fill(fruitCircle);
 					g.setColor(Color.DARK_GRAY);
 					g.drawString("" + f.getValue(), pFruit.ix(), pFruit.iy());
-					gc.getKMLog().addPlaceMark(type == -1 ? "fruit-banana" : "fruit-apple", "" + f.getLocation());
+//					gc.getKMLog().addPlaceMark(type == -1 ? "fruit-banana" : "fruit-apple", "" + f.getLocation());
 				}
 			}
 		}
@@ -289,8 +289,10 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 				try {
 					img = ImageIO.read(new File("./images/robot.png"));
 					Point3D pRobot = r.getGuiLocation();
-					g.drawImage(img, pRobot.ix() - 15, pRobot.iy() - 15, null);
-					gc.getKMLog().addPlaceMark("robot", "" + r.getLocation());
+					if (pRobot != null) {
+						g.drawImage(img, pRobot.ix() - 15, pRobot.iy() - 15, null);
+//						gc.getKMLog().addPlaceMark("robot", "" + r.getLocation());
+					}
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
