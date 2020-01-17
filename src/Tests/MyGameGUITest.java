@@ -1,6 +1,6 @@
 package Tests;
 
-import gui.MyGameGUI;
+import gameClient.MyGameGUI;
 
 public class MyGameGUITest {
 

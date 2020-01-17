@@ -1,4 +1,4 @@
-package gui;
+package gameClient;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -29,7 +29,6 @@ import dataStructure.Robot;
 import dataStructure.edge_data;
 import dataStructure.graph;
 import dataStructure.node_data;
-import gameClient.GameClient;
 import utils.Point3D;
 
 public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
