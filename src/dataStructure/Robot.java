@@ -14,6 +14,9 @@ public class Robot {
 	private Point3D location;
 	private Point3D guiLocation;
 
+	/**
+	 * Empty constructors
+	 */
 	public Robot() {
 
 	}

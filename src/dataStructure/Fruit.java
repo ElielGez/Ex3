@@ -16,6 +16,9 @@ public class Fruit {
 	private boolean onTarget;
 	public static final Comparator<Fruit> comp = new Fruit_Comperator();
 
+	/**
+	 * Empty constructor
+	 */
 	public Fruit() {
 
 	}
@@ -150,6 +153,9 @@ public class Fruit {
 		this.onTarget = onTarget;
 	}
 
+	/**
+	 * toString function
+	 */
 	public String toString() {
 		return "value: " + value + ", type: " + type + ", location: " + location;
 	}

@@ -14,6 +14,10 @@ public class KML_Logger {
 	private static final String APPLE_STYLE_ID = "fruit-apple";
 	private static final String ROBOT_STYLE_ID = "robot";
 
+	/**
+	 * Constructor to create the begining of the kml file
+	 * @param name
+	 */
 	public KML_Logger(String name) {
 		this.name = name;
 		content = new StringBuilder();
@@ -56,6 +60,11 @@ public class KML_Logger {
 		content.append("    </Style>\r\n");
 	}
 
+	/**
+	 * Function to add place mark by type (style id)
+	 * @param type
+	 * @param pos
+	 */
 	private void addPlaceMark(String type, String pos) {
 		LocalDateTime now = LocalDateTime.now();
 		content.append("    <Placemark>\r\n");
@@ -70,18 +79,34 @@ public class KML_Logger {
 
 	}
 
+	/**
+	 * Function to create node place mark
+	 * @param pos
+	 */
 	public void addNodePlaceMark(String pos) {
 		addPlaceMark(NODE_STYLE_ID, pos);
 	}
 
+	/**
+	 * Function to create robot place mark
+	 * @param pos
+	 */
 	public void addRobotPlaceMark(String pos) {
 		addPlaceMark(ROBOT_STYLE_ID, pos);
 	}
 
+	/**
+	 * Function to create fruit place mark , banana or apple
+	 * @param fruit
+	 * @param pos
+	 */
 	public void addFruitPlaceMark(String fruit, String pos) {
 		addPlaceMark(fruit == "apple" ? APPLE_STYLE_ID : BANANA_STYLE_ID, pos);
 	}
 
+	/**
+	 * Function to close kml file and save it on data folder
+	 */
 	public void closeDocument() {
 		content.append("  </Document>\r\n");
 		content.append("</kml>");

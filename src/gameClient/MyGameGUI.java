@@ -24,7 +24,6 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import dataStructure.Fruit;
-import dataStructure.GameAlgo;
 import dataStructure.Robot;
 import dataStructure.edge_data;
 import dataStructure.graph;

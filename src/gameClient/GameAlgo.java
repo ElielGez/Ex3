@@ -1,4 +1,4 @@
-package dataStructure;
+package gameClient;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -12,7 +12,12 @@ import org.json.JSONObject;
 import Server.game_service;
 import algorithms.Graph_Algo;
 import algorithms.graph_algorithms;
-import gameClient.KML_Logger;
+import dataStructure.Fruit;
+import dataStructure.Node;
+import dataStructure.Robot;
+import dataStructure.edge_data;
+import dataStructure.graph;
+import dataStructure.node_data;
 import utils.Point3D;
 
 public class GameAlgo {

@@ -8,7 +8,6 @@ import org.json.JSONObject;
 import Server.Game_Server;
 import Server.game_service;
 import dataStructure.DGraph;
-import dataStructure.GameAlgo;
 import dataStructure.graph;
 import dataStructure.node_data;
 
@@ -21,6 +20,9 @@ public class GameClient implements Runnable {
 
 	public static final double EPS = 0.000001;
 
+	/**
+	 * Empty constructor
+	 */
 	public GameClient() {
 	}
 
@@ -138,14 +140,39 @@ public class GameClient implements Runnable {
 		return game.getRobots();
 	}
 
+	/**
+	 * Getter for kml log
+	 * @return
+	 */
 	public KML_Logger getKMLog() {
 		return this.log;
 	}
 
+	/**
+	 * Function to init nodes on kml log
+	 */
 	private void initNodesLog() {
 		for (node_data n : this.g.getV()) {
 			this.log.addNodePlaceMark("" + n.getLocation());
 		}
+	}
+
+	/**
+	 * Setter for manual
+	 * 
+	 * @param isManual
+	 */
+	public void setIsManual(boolean isManual) {
+		this.isManual = isManual;
+	}
+
+	/**
+	 * Getter for manual
+	 * 
+	 * @return
+	 */
+	public boolean IsManual() {
+		return this.isManual;
 	}
 
 	/**
@@ -178,23 +205,5 @@ public class GameClient implements Runnable {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
-
-	/**
-	 * Setter for manual
-	 * 
-	 * @param isManual
-	 */
-	public void setIsManual(boolean isManual) {
-		this.isManual = isManual;
-	}
-
-	/**
-	 * Getter for manual
-	 * 
-	 * @return
-	 */
-	public boolean IsManual() {
-		return this.isManual;
 	}
 }
