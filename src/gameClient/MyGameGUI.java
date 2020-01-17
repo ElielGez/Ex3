@@ -314,7 +314,7 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 		if (gc.getGame().isRunning())
 			g.drawString("Time left: " + gc.getGameClock(), 30, 90);
 		g.drawString("Score: " + gc.getGameGrade(), 900, 90);
-		if (!gc.getGame().isRunning()) {
+		if (!gc.getGame().isRunning() && gc.getGameGrade() != 0) { // game over
 			g.setColor(Color.ORANGE);
 			g.setFont(new Font("Arial", 1, 50));
 			g.drawString("Game Over!", 300, 500);

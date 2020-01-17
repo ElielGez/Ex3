@@ -100,11 +100,11 @@ public class GameClient implements Runnable {
 	 * 
 	 * @return
 	 */
-	public String getGameGrade() {
-		String grade = "0";
+	public int getGameGrade() {
+		int grade = 0;
 		JSONObject gs = getGameServerJson();
 		try {
-			grade = "" + gs.getInt("grade");
+			grade = gs.getInt("grade");
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
