@@ -60,6 +60,7 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 	 */
 	private void initStage(int stage) {
 		gc = new GameClient(stage);
+		gc.setExportKMLOnEnd(false);
 		this.ga = gc.getGameAlgo();
 		this.mc = this.getG().getMC();
 	}
@@ -317,6 +318,7 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 			g.setColor(Color.ORANGE);
 			g.setFont(new Font("Arial", 1, 50));
 			g.drawString("Game Over!", 300, 500);
+			exportKML();
 		}
 	}
 
@@ -486,6 +488,22 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 			}
 			Thread t = new Thread(gc);
 			t.start();
+
+		} catch (Exception ex) {
+			JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
+		}
+	}
+
+	/**
+	 * Function to choose if you want to export kml when game over or not
+	 */
+	private void exportKML() {
+		try {
+			int reply = JOptionPane.showConfirmDialog(null, "You want to export KML log?", "Export kml log",
+					JOptionPane.YES_NO_OPTION);
+			if (reply == JOptionPane.YES_OPTION) {
+				gc.getKMLog().closeDocument();
+			}
 
 		} catch (Exception ex) {
 			JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);

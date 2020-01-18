@@ -17,6 +17,8 @@ public class GameClient implements Runnable {
 	private game_service game;
 	private GameAlgo game_algo;
 	private KML_Logger log;
+	private boolean exportKMLOnEnd;
+	private int stage;
 
 	public static final double EPS = 0.000001;
 
@@ -32,6 +34,8 @@ public class GameClient implements Runnable {
 	 * @param stage
 	 */
 	public GameClient(int stage) {
+		this.stage = stage;
+		this.exportKMLOnEnd = true;
 		log = new KML_Logger("" + stage);
 		game = Game_Server.getServer(stage);
 		g = new DGraph();
@@ -42,6 +46,14 @@ public class GameClient implements Runnable {
 		game_algo = new GameAlgo();
 		game_algo.initFruitsOnEdges(g, game, log);
 		game_algo.initRobotsOnNodes(g, game, log);
+	}
+
+	/**
+	 * Setter for export kml on end
+	 * @param exportKMLOnEnd
+	 */
+	public void setExportKMLOnEnd(boolean exportKMLOnEnd) {
+		this.exportKMLOnEnd = exportKMLOnEnd;
 	}
 
 	/**
@@ -142,6 +154,7 @@ public class GameClient implements Runnable {
 
 	/**
 	 * Getter for kml log
+	 * 
 	 * @return
 	 */
 	public KML_Logger getKMLog() {
@@ -200,8 +213,10 @@ public class GameClient implements Runnable {
 				ind++;
 			}
 			g.upgradeMC();
-			log.closeDocument();
-			System.out.println(game.toString());
+			if (this.exportKMLOnEnd)
+				log.closeDocument();
+			System.out.println(
+					"Stage: " + this.stage + ", Moves: " + this.getGameMoves() + ", Grade: " + this.getGameGrade());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
