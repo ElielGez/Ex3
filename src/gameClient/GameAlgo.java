@@ -3,6 +3,7 @@ package gameClient;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -24,7 +25,15 @@ public class GameAlgo {
 	private ArrayList<Fruit> fruitList;
 	private ArrayList<Robot> robotList;
 	private graph_algorithms graph_algo = new Graph_Algo();
+	private RobotFruitPathContainer rfpArray;
+	private double x_scale[];
+	private double y_scale[];
 
+	private final int WIDTH = 1000;
+	private final int HEIGHT = 1000;
+	private final int X_SCALE_TMIN = 15;
+	private final int Y_SCALE_TMIN = 200;
+	private final int Y_SCALE_TMAX = 50;
 	public static final double EPS = 0.000001;
 
 	/**
@@ -33,6 +42,76 @@ public class GameAlgo {
 	public GameAlgo() {
 		fruitList = new ArrayList<>();
 		robotList = new ArrayList<>();
+		rfpArray = new RobotFruitPathContainer();
+	}
+
+	/**
+	 * Function that scale the locations of nodes,robots and fruits
+	 */
+	public void initNodes(graph g, KML_Logger log) {
+		this.x_scale = xAxis_Min_Max(g);
+		this.y_scale = yAxis_Min_Max(g);
+
+		for (node_data n : g.getV()) {
+			double x = scale(n.getLocation().x(), x_scale[0], x_scale[1], X_SCALE_TMIN, WIDTH - Y_SCALE_TMAX);
+			double y = scale(n.getLocation().y(), y_scale[1], y_scale[0], Y_SCALE_TMIN, HEIGHT - Y_SCALE_TMAX);
+			Point3D p = new Point3D(x, y);
+			n.setGuiLocation(p);
+			log.addNodePlaceMark("" + n.getLocation());
+		}
+	}
+
+	/**
+	 * Function to get min and max of xAxis , used on scale function
+	 * 
+	 * @param g
+	 * @return
+	 */
+	private double[] xAxis_Min_Max(graph g) {
+		double arr[] = { Double.MAX_VALUE, Double.MIN_VALUE }; // min [0] max [1]
+		for (node_data n : g.getV()) {
+			Point3D p = n.getLocation();
+			if (p.x() < arr[0])
+				arr[0] = p.x();
+			if (p.x() > arr[1])
+				arr[1] = p.x();
+
+		}
+		return arr;
+	}
+
+	/**
+	 * Function to get min and max of yAxis , used on scale function
+	 * 
+	 * @param g
+	 * @return
+	 */
+	private double[] yAxis_Min_Max(graph g) {
+		double arr[] = { Double.MAX_VALUE, Double.MIN_VALUE }; // min [0] max [1]
+		for (node_data n : g.getV()) {
+			Point3D p = n.getLocation();
+			if (p.y() < arr[0])
+				arr[0] = p.y();
+			if (p.y() > arr[1])
+				arr[1] = p.y();
+
+		}
+		return arr;
+	}
+
+	/**
+	 * Function scale some point
+	 * 
+	 * @param data
+	 * @param r_min
+	 * @param r_max
+	 * @param t_min
+	 * @param t_max
+	 * @return
+	 */
+	private double scale(double data, double r_min, double r_max, double t_min, double t_max) {
+		double res = ((data - r_min) / (r_max - r_min)) * (t_max - t_min) + t_min;
+		return res;
 	}
 
 	/**
@@ -83,6 +162,10 @@ public class GameAlgo {
 			while (f_iter.hasNext()) {
 				String next = f_iter.next();
 				Fruit f = new Fruit(next);
+				double xF = scale(f.getLocation().x(), x_scale[0], x_scale[1], X_SCALE_TMIN, WIDTH - Y_SCALE_TMAX);
+				double yF = scale(f.getLocation().y(), y_scale[1], y_scale[0], Y_SCALE_TMIN, HEIGHT - Y_SCALE_TMAX);
+				Point3D pF = new Point3D(xF, yF);
+				f.setGuiLocation(pF);
 				log.addFruitPlaceMark(f.getType() == -1 ? "banana" : "apple", "" + f.getLocation());
 				for (node_data src : g.getV()) {
 					Collection<edge_data> e = g.getE(src.getKey());
@@ -142,6 +225,10 @@ public class GameAlgo {
 			List<String> robots = game.getRobots();
 			for (String string : robots) {
 				Robot r = new Robot(string);
+				double xR = scale(r.getLocation().x(), x_scale[0], x_scale[1], X_SCALE_TMIN, WIDTH - Y_SCALE_TMAX);
+				double yR = scale(r.getLocation().y(), y_scale[1], y_scale[0], Y_SCALE_TMIN, HEIGHT - Y_SCALE_TMAX);
+				Point3D pR = new Point3D(xR, yR);
+				r.setGuiLocation(pR);
 				log.addRobotPlaceMark("" + r.getLocation());
 				this.addRobot(r);
 			}
@@ -225,13 +312,64 @@ public class GameAlgo {
 		game.chooseNextEdge(id, dest);
 	}
 
+	public void moveRobotsAuto(game_service game, graph g) {
+		synchronized (game) {
+			graph_algo.init(g);
+			rfpArray = new RobotFruitPathContainer();
+			synchronized (robotList) {
+				for (Robot r : robotList) {
+					synchronized (fruitList) {
+						for (Fruit f : fruitList) {
+							List<node_data> path = findPathsRobotToFruit(r, f);
+							if (path == null) { // no paths for this robot to fruit , go next fruit
+								continue;
+							} else {// there is path , find the distance
+								double distance = Math.abs(f.getGuiLocation().distance2D(r.getGuiLocation()));
+								rfpArray.add(new RobotFruitPath(distance, f, r, path));
+							}
+						}
+					}
+				}
+			}
+			rfpArray.sort();
+			for (RobotFruitPath rfp : rfpArray.getList()) {
+				if (!rfp.getF().isOnTarget()) {
+					moveByPath(rfp.getR().getId(), rfp.getPath(), game);
+					rfp.getF().setOnTarget(true);
+				}
+
+			}
+		}
+	}
+
+	private List<node_data> findPathsRobotToFruit(Robot r, Fruit f) {
+		edge_data e = f.getEdge();
+		int src = r.getSrc();
+		int dest = -1;
+		int last = -1;
+		if (f.getType() == -1) {
+			dest = e.getDest() > e.getSrc() ? e.getSrc() : e.getDest();
+			last = e.getDest() > e.getSrc() ? e.getDest() : e.getSrc();
+		}
+		if (f.getType() == 1) {
+			dest = e.getDest() > e.getSrc() ? e.getDest() : e.getSrc();
+			last = e.getDest() > e.getSrc() ? e.getSrc() : e.getDest();
+		}
+		List<node_data> path = graph_algo.shortestPath(src, dest);
+		path.add(new Node(last));
+		if (path != null && path.size() > 1)
+			return path;
+		else
+			return null;
+	}
+
 	/**
 	 * Function to move robots with auto algorithm
 	 * 
 	 * @param game
 	 * @param g
 	 */
-	public void moveRobotsAuto(game_service game, graph g) {
+	public void moveRobotsAuto2(game_service game, graph g) {
 		graph_algo.init(g);
 		synchronized (robotList) {
 			for (Robot r : robotList) {

@@ -41,9 +41,6 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 	private static final String GAME = "Game";
 	private final int WIDTH = 1000;
 	private final int HEIGHT = 1000;
-	private final int X_SCALE_TMIN = 15;
-	private final int Y_SCALE_TMIN = 200;
-	private final int Y_SCALE_TMAX = 50;
 
 	/**
 	 * Empty constructor
@@ -166,54 +163,11 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 	}
 
 	/**
-	 * Function that scale the locations of nodes,robots and fruits
-	 */
-	private void setGuiLocations() {
-		graph g = this.gc.getGraph();
-		double x_scale[] = xAxis_Min_Max(g);
-		double y_scale[] = yAxis_Min_Max(g);
-
-		// node set guid location
-		for (node_data n : g.getV()) {
-			double x = scale(n.getLocation().x(), x_scale[0], x_scale[1], X_SCALE_TMIN, this.getWidth() - Y_SCALE_TMAX);
-			double y = scale(n.getLocation().y(), y_scale[1], y_scale[0], Y_SCALE_TMIN,
-					this.getHeight() - Y_SCALE_TMAX);
-			Point3D p = new Point3D(x, y);
-			n.setGuiLocation(p);
-		}
-
-		synchronized (ga.fruitList()) {
-			// fruit set gui location
-			for (Fruit f : ga.fruitList()) {
-				double xF = scale(f.getLocation().x(), x_scale[0], x_scale[1], X_SCALE_TMIN,
-						this.getWidth() - Y_SCALE_TMAX);
-				double yF = scale(f.getLocation().y(), y_scale[1], y_scale[0], Y_SCALE_TMIN,
-						this.getHeight() - Y_SCALE_TMAX);
-				Point3D pF = new Point3D(xF, yF);
-				f.setGuiLocation(pF);
-			}
-		}
-
-		synchronized (ga.robotList()) {
-			// robot set gui location
-			for (Robot r : ga.robotList()) {
-				double xR = scale(r.getLocation().x(), x_scale[0], x_scale[1], X_SCALE_TMIN,
-						this.getWidth() - Y_SCALE_TMAX);
-				double yR = scale(r.getLocation().y(), y_scale[1], y_scale[0], Y_SCALE_TMIN,
-						this.getHeight() - Y_SCALE_TMAX);
-				Point3D pR = new Point3D(xR, yR);
-				r.setGuiLocation(pR);
-			}
-		}
-	}
-
-	/**
 	 * Function that draw the graph with his nodes and edges
 	 * 
 	 * @param g1
 	 */
 	private void drawGraph(Graphics2D g) {
-		setGuiLocations();
 
 		g.setFont(new Font("Arial", 1, 15));
 		for (node_data src : this.getG().getV()) {
@@ -320,44 +274,6 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 			g.drawString("Game Over!", 300, 500);
 			exportKML();
 		}
-	}
-
-	/**
-	 * Function to get min and max of xAxis , used on scale function
-	 * 
-	 * @param g
-	 * @return
-	 */
-	private double[] xAxis_Min_Max(graph g) {
-		double arr[] = { Double.MAX_VALUE, Double.MIN_VALUE }; // min [0] max [1]
-		for (node_data n : g.getV()) {
-			Point3D p = n.getLocation();
-			if (p.x() < arr[0])
-				arr[0] = p.x();
-			if (p.x() > arr[1])
-				arr[1] = p.x();
-
-		}
-		return arr;
-	}
-
-	/**
-	 * Function to get min and max of yAxis , used on scale function
-	 * 
-	 * @param g
-	 * @return
-	 */
-	private double[] yAxis_Min_Max(graph g) {
-		double arr[] = { Double.MAX_VALUE, Double.MIN_VALUE }; // min [0] max [1]
-		for (node_data n : g.getV()) {
-			Point3D p = n.getLocation();
-			if (p.y() < arr[0])
-				arr[0] = p.y();
-			if (p.y() > arr[1])
-				arr[1] = p.y();
-
-		}
-		return arr;
 	}
 
 	@Override
@@ -510,18 +426,4 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 		}
 	}
 
-	/**
-	 * Function scale some point
-	 * 
-	 * @param data
-	 * @param r_min
-	 * @param r_max
-	 * @param t_min
-	 * @param t_max
-	 * @return
-	 */
-	private double scale(double data, double r_min, double r_max, double t_min, double t_max) {
-		double res = ((data - r_min) / (r_max - r_min)) * (t_max - t_min) + t_min;
-		return res;
-	}
 }
