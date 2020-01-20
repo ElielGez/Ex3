@@ -1,6 +1,5 @@
 package gameClient;
 
-import java.util.HashMap;
 import java.util.List;
 
 import org.json.JSONException;
@@ -10,7 +9,6 @@ import Server.Game_Server;
 import Server.game_service;
 import dataStructure.DGraph;
 import dataStructure.graph;
-import dataStructure.node_data;
 
 public class GameClient implements Runnable {
 	private boolean isManual;
@@ -34,13 +32,13 @@ public class GameClient implements Runnable {
 			310/* 13 */, Integer.MAX_VALUE/* 14 */, Integer.MAX_VALUE/* 15 */, 235/* 16 */, Integer.MAX_VALUE/* 17 */,
 			Integer.MAX_VALUE/* 18 */, 250/* 19 */, 200/* 20 */, Integer.MAX_VALUE/* 21 */, Integer.MAX_VALUE/* 22 */,
 			1000/* 23 */ };
-	private static final int[] sleep = { 10/* 0 */, 10/* 1 */, 50/* 2 */, 30/* 3 */, 50/* 4 */, 50/* 5 */, 50/* 6 */,
-			50/* 7 */, 50/* 8 */, 50/* 9 */, 50/* 10 */, 50/* 11 */, 50/* 12 */, 50/* 13 */, 50/* 14 */, 50/* 15 */,
-			50/* 16 */, 50/* 17 */, 50/* 18 */, 50/* 19 */, 50/* 20 */, 50/* 21 */, 50/* 22 */, 4/* 23 */ };
+	private static final int[] sleep = { 10/* 0 */, 10/* 1 */, 50/* 2 */, 10/* 3 */, 50/* 4 */, 10/* 5 */, 50/* 6 */,
+			50/* 7 */, 50/* 8 */, 10/* 9 */, 50/* 10 */, 50/* 11 */, 50/* 12 */, 52/* 13 */, 50/* 14 */, 50/* 15 */,
+			50/* 16 */, 50/* 17 */, 50/* 18 */, 50/* 19 */, 20/* 20 */, 50/* 21 */, 50/* 22 */, 10/* 23 */ };
 
-	private static final int[] mod = { 10/* 0 */, 10/* 1 */, 2/* 2 */, 5/* 3 */, 2/* 4 */, 2/* 5 */, 2/* 6 */, 2/* 7 */,
-			2/* 8 */, 2/* 9 */, 2/* 10 */, 2/* 11 */, 2/* 12 */, 2/* 13 */, 2/* 14 */, 2/* 15 */, 2/* 16 */, 2/* 17 */,
-			2/* 18 */, 2/* 19 */, 2/* 20 */, 2/* 21 */, 2/* 22 */, 15/* 23 */ };
+	private static final int[] mod = { 10/* 0 */, 10/* 1 */, 2/* 2 */, 6/* 3 */, 2/* 4 */, 6/* 5 */, 2/* 6 */, 2/* 7 */,
+			2/* 8 */, 6/* 9 */, 2/* 10 */, 2/* 11 */, 2/* 12 */, 2/* 13 */, 2/* 14 */, 2/* 15 */, 2/* 16 */, 2/* 17 */,
+			2/* 18 */, 2/* 19 */, 4/* 20 */, 2/* 21 */, 2/* 22 */, 6/* 23 */ };
 
 	/**
 	 * Empty constructor
@@ -56,7 +54,7 @@ public class GameClient implements Runnable {
 	public GameClient(int stage) {
 		this();
 		this.stage = stage;
-		this.exportKMLOnEnd = true;
+		this.exportKMLOnEnd = false;
 		log = new KML_Logger("" + stage);
 		game = Game_Server.getServer(stage);
 		g = new DGraph();
@@ -200,13 +198,17 @@ public class GameClient implements Runnable {
 	public boolean IsManual() {
 		return this.isManual;
 	}
+	
+	public int getStage() {
+		return this.stage;
+	}
 
 	/**
 	 * Override function of runnable , this function run the game on thread and
 	 * moving every even number the robots
 	 */
 	@Override
-	public void run() { // this run works with stages : 3,5,11,13,19,20,23
+	public void run() { // stages that working : 0,1,3,5,11,13,19,23
 		try {
 			Game_Server.login(316519966);
 			game.startGame();
@@ -232,7 +234,7 @@ public class GameClient implements Runnable {
 				log.closeDocument();
 //			System.out.println("stage: " + this.stage + " " + game.toString());
 			calculateResults();
-//			game.sendKML(log.getContent());
+			game.sendKML(log.getContent());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -256,4 +258,5 @@ public class GameClient implements Runnable {
 			System.out.println("Expected: Moves: " + moves[this.stage] + ", Grade: " + grade[this.stage]);
 		}
 	}
+	
 }

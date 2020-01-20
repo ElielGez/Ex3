@@ -353,12 +353,12 @@ public class GameAlgo {
 		int dest = -1;
 		int last = -1;
 		if (f.getType() == -1) {
-			dest = e.getDest() > e.getSrc() ? e.getSrc() : e.getDest();
-			last = e.getDest() > e.getSrc() ? e.getDest() : e.getSrc();
-		}
-		if (f.getType() == 1) {
 			dest = e.getDest() > e.getSrc() ? e.getDest() : e.getSrc();
 			last = e.getDest() > e.getSrc() ? e.getSrc() : e.getDest();
+		}
+		if (f.getType() == 1) {
+			dest = e.getDest() < e.getSrc() ? e.getDest() : e.getSrc();
+			last = e.getDest() < e.getSrc() ? e.getSrc() : e.getDest();
 		}
 		List<node_data> path = graph_algo.shortestPath(src, dest);
 		path.add(new Node(last));

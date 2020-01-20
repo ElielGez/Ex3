@@ -17,10 +17,14 @@ import java.awt.geom.Arc2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.Vector;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
@@ -46,6 +50,7 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 
 	private static final String GAME = "Game";
 	private static final String MY_RESULTS = "My Results";
+	private static final String STAGE_RESULTS = "Stage Results";
 	private static final String GAME_RESULTS = "Game Results";
 	private final int WIDTH = 1000;
 	private final int HEIGHT = 1000;
@@ -121,11 +126,14 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 		game.addActionListener(this);
 		MenuItem my_results = new MenuItem(MY_RESULTS);
 		my_results.addActionListener(this);
+		MenuItem stage_results = new MenuItem(STAGE_RESULTS);
+		stage_results.addActionListener(this);
 		MenuItem game_results = new MenuItem(GAME_RESULTS);
 		game_results.addActionListener(this);
 
 		menu1.add(game);
 		menu2.add(my_results);
+		menu2.add(stage_results);
 		menu2.add(game_results);
 
 		this.addMouseListener(this);
@@ -288,7 +296,7 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 			g.setColor(Color.ORANGE);
 			g.setFont(new Font("Arial", 1, 50));
 			g.drawString("Game Over!", 300, 500);
-//			exportKML();
+			exportKML();
 		}
 	}
 
@@ -390,14 +398,15 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		String str = e.getActionCommand();
+		String id_str = "";
+		int id = 999;
 		switch (str) {
 		case GAME: {
 			chooseStagePopup();
 			break;
 		}
-		case MY_RESULTS:
-			String id_str = JOptionPane.showInputDialog(this, "Please insert id");
-			int id = 999;
+		case MY_RESULTS: {
+			id_str = JOptionPane.showInputDialog(this, "Please insert id");
 			try {
 				id = Integer.parseInt(id_str);
 			} catch (Exception ex) {
@@ -405,9 +414,21 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 			}
 			showMyResults(id);
 			break;
-		case GAME_RESULTS:
+		}
+		case STAGE_RESULTS: {
+			id_str = JOptionPane.showInputDialog(this, "Please insert id");
+			try {
+				id = Integer.parseInt(id_str);
+			} catch (Exception ex) {
+				JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
+			}
+			showStageResults(id, gc.getStage());
+			break;
+		}
+		case GAME_RESULTS: {
 			showAllResults();
 			break;
+		}
 		}
 
 	}
@@ -475,6 +496,35 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 		scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		frame1.add(scroll);
 		frame1.setSize(600, 400);
+		frame1.setVisible(true);
+	}
+
+	private void showStageResults(int id, int stage) {
+		String[] columnNames = { "Rank", "UserID", "LevelID", "score", "moves", "time" };
+		JFrame frame1 = new JFrame("Stage Results");
+		frame1.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		frame1.setLayout(new BorderLayout());
+		DefaultTableModel tableModel = new DefaultTableModel();
+		for (String columnName : columnNames) {
+			tableModel.addColumn(columnName);
+		}
+		LinkedHashMap<String, String> tp = DBQueries.stageBestResults(stage);
+		int rank = 1;
+		for (Map.Entry<String, String> entry : tp.entrySet()) {
+			Vector<String> v1 = new Vector<String>();
+			v1.add("" + rank);
+			Vector<String> v2 = new Vector<String>(Arrays.asList(entry.getValue().split(",")));
+			v1.addAll(v2);
+			tableModel.addRow(v1);
+			rank++;
+		}
+
+		JTable table = new JTable(tableModel);
+		JScrollPane scroll = new JScrollPane(table);
+		scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		frame1.add(scroll);
+		frame1.setSize(400, 300);
 		frame1.setVisible(true);
 	}
 

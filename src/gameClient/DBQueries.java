@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -131,5 +132,26 @@ public class DBQueries {
 		}
 		closeQuery(resultSet);
 		return tp;
+	}
+
+	public static LinkedHashMap<String, String> stageBestResults(int stage) {
+		String query = "SELECT * FROM Logs as logs inner join ("
+				+ "SELECT max(score) as score, levelID, userID FROM Logs group by levelID,userID" + ") as groupedLogs"
+				+ " on logs.userID = groupedLogs.userID and logs.levelID = groupedLogs.levelID and logs.score = groupedLogs.score"
+				+ " where logs.levelID = " + stage + " order by logs.score desc";
+		ResultSet resultSet = doQuery(query);
+		LinkedHashMap<String, String> hp = new LinkedHashMap<String, String>();
+		try {
+			while (resultSet.next()) {
+				String value = "" + resultSet.getInt("userID") + "," + resultSet.getInt("levelID") + ","
+						+ resultSet.getInt("score") + "," + resultSet.getInt("moves") + "," + resultSet.getDate("time");
+				hp.put(resultSet.getInt("userID") + "," + resultSet.getInt("levelID"), value);
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		closeQuery(resultSet);
+		return hp;
 	}
 }
