@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 import com.mysql.jdbc.ResultSetMetaData;
 
@@ -87,100 +88,48 @@ public class DBQueries {
 		return count;
 	}
 
-	public static HashMap<String, ResultSet> myBestResults(int id) {
+	public static TreeMap<Integer, String> myBestResults(int id) {
 		String query = "SELECT * FROM Logs as logs inner join (" + "SELECT max(score) as score, levelID FROM Logs"
 				+ " where userID = " + id + " group by levelID" + ") as groupedLogs"
 				+ " on logs.levelID = groupedLogs.levelID and logs.score = groupedLogs.score" + " where userID = " + id
-				+ " order by logs.levelID desc";
+				+ " order by logs.levelID asc";
 		ResultSet resultSet = doQuery(query);
-		HashMap<String, ResultSet> hp = new HashMap<String, ResultSet>();
+		TreeMap<Integer, String> tp = new TreeMap<Integer, String>();
 		try {
 
 			while (resultSet.next()) {
-				hp.put(resultSet.getInt("levelID") + "," + resultSet.getInt("userID"), resultSet);
+				String value = "" + resultSet.getInt("userID") + "," + resultSet.getInt("levelID") + ","
+						+ resultSet.getInt("score") + "," + resultSet.getInt("moves") + "," + resultSet.getDate("time");
+				tp.put(resultSet.getInt("levelID"), value);
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		closeQuery(resultSet);
-		return hp;
+		return tp;
 	}
 
-	public static HashMap<String, ResultSet> gameBestResults() {
+	public static TreeMap<String, String> gameBestResults() {
 		String query = "SELECT * FROM Logs as logs inner join ("
 				+ "SELECT max(score) as score, levelID, userID FROM Logs" + "	group by levelID,userID"
 				+ ") as groupedLogs"
 				+ " on logs.userID = groupedLogs.userID and logs.levelID = groupedLogs.levelID and logs.score = groupedLogs.score"
-				+ " order by logs.userID desc";
+				+ " order by logs.userID desc,logs.levelID asc";
 		ResultSet resultSet = doQuery(query);
-		HashMap<String, ResultSet> hp = new HashMap<String, ResultSet>();
+		TreeMap<String, String> tp = new TreeMap<String, String>();
 		try {
 
 			while (resultSet.next()) {
-				hp.put(resultSet.getInt("levelID") + "," + resultSet.getInt("userID"), resultSet);
+				String value = "" + resultSet.getInt("userID") + "," + resultSet.getInt("levelID") + ","
+						+ resultSet.getInt("score") + "," + resultSet.getInt("moves") + "," + resultSet.getDate("time");
+				tp.put(resultSet.getInt("userID") + "," + resultSet.getInt("levelID"), value);
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		closeQuery(resultSet);
-		return hp;
+		return tp;
 	}
-
-	/**
-	 * this function returns the KML string as stored in the database (userID,
-	 * level);
-	 * 
-	 * @param id
-	 * @param level
-	 * @return
-	 */
-//	public static String getKML(int id, int level) {
-//		String ans = null;
-//		String allCustomersQuery = "SELECT * FROM Users where userID=" + id + ";";
-//		try {
-//			Class.forName("com.mysql.jdbc.Driver");
-//			Connection connection = DriverManager.getConnection(jdbcUrl, jdbcUser, jdbcUserPassword);
-//			Statement statement = connection.createStatement();
-//			ResultSet resultSet = statement.executeQuery(allCustomersQuery);
-//			if (resultSet != null && resultSet.next()) {
-//				ans = resultSet.getString("kml_" + level);
-//			}
-//		} catch (SQLException sqle) {
-//			System.out.println("SQLException: " + sqle.getMessage());
-//			System.out.println("Vendor Error: " + sqle.getErrorCode());
-//		}
-//
-//		catch (ClassNotFoundException e) {
-//			e.printStackTrace();
-//		}
-//		return ans;
-//	}
-//
-//	public static int allUsers() {
-//		int ans = 0;
-//		String allCustomersQuery = "SELECT * FROM Users;";
-//		try {
-//			Class.forName("com.mysql.jdbc.Driver");
-//			Connection connection = DriverManager.getConnection(jdbcUrl, jdbcUser, jdbcUserPassword);
-//			Statement statement = connection.createStatement();
-//			ResultSet resultSet = statement.executeQuery(allCustomersQuery);
-//			while (resultSet.next()) {
-//				System.out.println("Id: " + resultSet.getInt("UserID"));
-//				ans++;
-//			}
-//			resultSet.close();
-//			statement.close();
-//			connection.close();
-//		} catch (SQLException sqle) {
-//			System.out.println("SQLException: " + sqle.getMessage());
-//			System.out.println("Vendor Error: " + sqle.getErrorCode());
-//		}
-//
-//		catch (ClassNotFoundException e) {
-//			e.printStackTrace();
-//		}
-//		return ans;
-//	}
 }

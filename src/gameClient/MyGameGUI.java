@@ -1,5 +1,6 @@
 package gameClient;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -18,10 +19,15 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
 
 import dataStructure.Fruit;
 import dataStructure.Robot;
@@ -39,6 +45,8 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 	private int MOVE_TO_DEST = -1;
 
 	private static final String GAME = "Game";
+	private static final String MY_RESULTS = "My Results";
+	private static final String GAME_RESULTS = "Game Results";
 	private final int WIDTH = 1000;
 	private final int HEIGHT = 1000;
 
@@ -105,12 +113,20 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 		MenuBar menuBar = new MenuBar();
 		Menu menu1 = new Menu("New");
 		menuBar.add(menu1);
+		Menu menu2 = new Menu("Results");
+		menuBar.add(menu2);
 		this.setMenuBar(menuBar);
 
 		MenuItem game = new MenuItem(GAME);
 		game.addActionListener(this);
+		MenuItem my_results = new MenuItem(MY_RESULTS);
+		my_results.addActionListener(this);
+		MenuItem game_results = new MenuItem(GAME_RESULTS);
+		game_results.addActionListener(this);
 
 		menu1.add(game);
+		menu2.add(my_results);
+		menu2.add(game_results);
 
 		this.addMouseListener(this);
 
@@ -379,8 +395,21 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 			chooseStagePopup();
 			break;
 		}
-
+		case MY_RESULTS:
+			String id_str = JOptionPane.showInputDialog(this, "Please insert id");
+			int id = 999;
+			try {
+				id = Integer.parseInt(id_str);
+			} catch (Exception ex) {
+				JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
+			}
+			showMyResults(id);
+			break;
+		case GAME_RESULTS:
+			showAllResults();
+			break;
 		}
+
 	}
 
 	/**
@@ -424,6 +453,52 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 		} catch (Exception ex) {
 			JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
 		}
+	}
+
+	private void showMyResults(int id) {
+		String[] columnNames = { "UserID", "LevelID", "score", "moves", "time" };
+		JFrame frame1 = new JFrame("My Game Results");
+		frame1.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame1.setLayout(new BorderLayout());
+		DefaultTableModel tableModel = new DefaultTableModel();
+		for (String columnName : columnNames) {
+			tableModel.addColumn(columnName);
+		}
+		TreeMap<Integer, String> tp = DBQueries.myBestResults(id);
+		for (Map.Entry<Integer, String> entry : tp.entrySet()) {
+			tableModel.addRow(entry.getValue().split(","));
+		}
+
+		JTable table = new JTable(tableModel);
+		JScrollPane scroll = new JScrollPane(table);
+		scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		frame1.add(scroll);
+		frame1.setSize(400, 300);
+		frame1.setVisible(true);
+	}
+
+	private void showAllResults() {
+		String[] columnNames = { "UserID", "LevelID", "score", "moves", "time" };
+		JFrame frame1 = new JFrame("Game Results");
+		frame1.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame1.setLayout(new BorderLayout());
+		DefaultTableModel tableModel = new DefaultTableModel();
+		for (String columnName : columnNames) {
+			tableModel.addColumn(columnName);
+		}
+		TreeMap<String, String> tp = DBQueries.gameBestResults();
+		for (Map.Entry<String, String> entry : tp.entrySet()) {
+			tableModel.addRow(entry.getValue().split(","));
+		}
+
+		JTable table = new JTable(tableModel);
+		JScrollPane scroll = new JScrollPane(table);
+		scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		frame1.add(scroll);
+		frame1.setSize(400, 300);
+		frame1.setVisible(true);
 	}
 
 }
