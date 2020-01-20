@@ -457,7 +457,7 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 
 	private void showMyResults(int id) {
 		String[] columnNames = { "UserID", "LevelID", "score", "moves", "time" };
-		JFrame frame1 = new JFrame("My Game Results");
+		JFrame frame1 = new JFrame("My Game Results, Games Played: " + DBQueries.gamesPlayed(id));
 		frame1.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame1.setLayout(new BorderLayout());
 		DefaultTableModel tableModel = new DefaultTableModel();
@@ -474,7 +474,7 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 		scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		frame1.add(scroll);
-		frame1.setSize(400, 300);
+		frame1.setSize(600, 400);
 		frame1.setVisible(true);
 	}
 
