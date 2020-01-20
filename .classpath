@@ -5,6 +5,6 @@
 	<classpathentry kind="lib" path="C:/Users/Eliel/eclipse-workspace/Ex3/lib/java-json.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/5"/>
 	<classpathentry kind="lib" path="C:/Users/Eliel/eclipse-workspace/Ex3/lib/mysql-connector-java-5.1.47.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Eliel/eclipse-workspace/Ex3/lib/GameServer_v0.27.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Eliel/eclipse-workspace/Ex3/lib/GameServer_v0.32.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

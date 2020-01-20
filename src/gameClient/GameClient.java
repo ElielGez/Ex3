@@ -21,17 +21,31 @@ public class GameClient implements Runnable {
 	private boolean exportKMLOnEnd;
 	private int stage;
 
-	private static final HashMap<Integer, Integer> moves = new HashMap<>();
-	private static final HashMap<Integer, Integer> grade = new HashMap<>();
-
 	public static final double EPS = 0.000001;
+	private static final int[] moves = { 290/* 0 */, 580/* 1 */, Integer.MAX_VALUE/* 2 */, 580/* 3 */,
+			Integer.MAX_VALUE/* 4 */, 500/* 5 */, Integer.MAX_VALUE/* 6 */, Integer.MAX_VALUE/* 7 */,
+			Integer.MAX_VALUE/* 8 */, 580/* 9 */, Integer.MAX_VALUE/* 10 */, 580/* 11 */, Integer.MAX_VALUE/* 12 */,
+			580/* 13 */, Integer.MAX_VALUE/* 14 */, Integer.MAX_VALUE/* 15 */, 290/* 16 */, Integer.MAX_VALUE/* 17 */,
+			Integer.MAX_VALUE/* 18 */, 580/* 19 */, 290/* 20 */, Integer.MAX_VALUE/* 21 */, Integer.MAX_VALUE/* 22 */,
+			1140/* 23 */ };
+	private static final int[] grade = { 145/* 0 */, 450/* 1 */, Integer.MAX_VALUE/* 2 */, 720/* 3 */,
+			Integer.MAX_VALUE/* 4 */, 570/* 5 */, Integer.MAX_VALUE/* 6 */, Integer.MAX_VALUE/* 7 */,
+			Integer.MAX_VALUE/* 8 */, 510/* 9 */, Integer.MAX_VALUE/* 10 */, 1050/* 11 */, Integer.MAX_VALUE/* 12 */,
+			310/* 13 */, Integer.MAX_VALUE/* 14 */, Integer.MAX_VALUE/* 15 */, 235/* 16 */, Integer.MAX_VALUE/* 17 */,
+			Integer.MAX_VALUE/* 18 */, 250/* 19 */, 200/* 20 */, Integer.MAX_VALUE/* 21 */, Integer.MAX_VALUE/* 22 */,
+			1000/* 23 */ };
+	private static final int[] sleep = { 10/* 0 */, 50/* 1 */, 50/* 2 */, 30/* 3 */, 50/* 4 */, 50/* 5 */, 50/* 6 */,
+			50/* 7 */, 50/* 8 */, 50/* 9 */, 50/* 10 */, 50/* 11 */, 50/* 12 */, 50/* 13 */, 50/* 14 */, 50/* 15 */,
+			50/* 16 */, 50/* 17 */, 50/* 18 */, 50/* 19 */, 50/* 20 */, 50/* 21 */, 50/* 22 */, 4/* 23 */ };
+	
+	private static final int[] mod = { 10/* 0 */, 2/* 1 */, 2/* 2 */, 5/* 3 */, 2/* 4 */, 2/* 5 */, 2/* 6 */, 2/* 7 */,
+			2/* 8 */, 2/* 9 */, 2/* 10 */, 2/* 11 */, 2/* 12 */, 2/* 13 */, 2/* 14 */, 2/* 15 */, 2/* 16 */, 2/* 17 */,
+			2/* 18 */, 2/* 19 */, 2/* 20 */, 2/* 21 */, 2/* 22 */, 15/* 23 */ };
 
 	/**
 	 * Empty constructor
 	 */
 	public GameClient() {
-		prepareHashMapMoves();
-		prepareHashMapGrade();
 	}
 
 	/**
@@ -194,9 +208,10 @@ public class GameClient implements Runnable {
 	@Override
 	public void run() { // this run works with stages : 3,5,11,13,19,20,23
 		try {
+			Game_Server.login(999);
 			game.startGame();
 			int ind = 0;
-			long dt = 50;
+			long dt = sleep[stage];
 			while (game.isRunning()) {
 				if (!isManual) {
 					game_algo.moveRobotsAuto(game, g);
@@ -204,7 +219,7 @@ public class GameClient implements Runnable {
 				game_algo.updateRobots(game, log);
 				game_algo.initFruitsOnEdges(g, game, log);
 
-				if (ind % 2 == 0 && this.getGameMoves() < moves.get(stage)) {
+				if (ind % mod[stage] == 0 && this.getGameMoves() < moves[stage]) {
 					game.move();
 					g.upgradeMC();
 				}
@@ -215,51 +230,11 @@ public class GameClient implements Runnable {
 			g.upgradeMC();
 			if (this.exportKMLOnEnd)
 				log.closeDocument();
-			calculateResults();
+			System.out.println(game.toString());
+//			calculateResults();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
-
-	private void prepareHashMapMoves() {
-		moves.put(0, 290);
-		moves.put(1, 580);
-		moves.put(2, Integer.MAX_VALUE);
-		moves.put(3, 580);
-		moves.put(4, Integer.MAX_VALUE);
-		moves.put(5, 500);
-		moves.put(6, Integer.MAX_VALUE);
-		moves.put(7, Integer.MAX_VALUE);
-		moves.put(8, Integer.MAX_VALUE);
-		moves.put(9, 580);
-		moves.put(10, Integer.MAX_VALUE);
-		moves.put(11, 580);
-		moves.put(12, Integer.MAX_VALUE);
-		moves.put(13, 580);
-		moves.put(14, Integer.MAX_VALUE);
-		moves.put(15, Integer.MAX_VALUE);
-		moves.put(16, 290);
-		moves.put(17, Integer.MAX_VALUE);
-		moves.put(18, Integer.MAX_VALUE);
-		moves.put(19, 580);
-		moves.put(20, 290);
-		moves.put(21, Integer.MAX_VALUE);
-		moves.put(22, Integer.MAX_VALUE);
-		moves.put(23, 1140);
-	}
-
-	private void prepareHashMapGrade() {
-		grade.put(0, 145);
-		grade.put(1, 450);
-		grade.put(3, 720);
-		grade.put(5, 570);
-		grade.put(9, 510);
-		grade.put(11, 1050);
-		grade.put(13, 310);
-		grade.put(16, 235);
-		grade.put(19, 250);
-		grade.put(20, 200);
-		grade.put(23, 1000);
 	}
 
 	private void calculateResults() {
@@ -268,7 +243,7 @@ public class GameClient implements Runnable {
 		int currentGrade = this.getGameGrade();
 
 		boolean failed = false;
-		if (currentMoves > moves.get(this.stage) || currentGrade < grade.get(this.stage)) {
+		if (currentMoves > moves[this.stage] || currentGrade < grade[this.stage]) {
 			failed = true;
 		}
 		if (!failed) {
@@ -277,7 +252,7 @@ public class GameClient implements Runnable {
 		} else {
 			System.out.println("Stage: " + this.stage + ", Moves: " + this.getGameMoves() + ", Grade: "
 					+ this.getGameGrade() + " FAILED");
-			System.out.println("Expected: Moves: " + moves.get(this.stage) + ", Grade: " + grade.get(this.stage));
+			System.out.println("Expected: Moves: " + moves[this.stage] + ", Grade: " + grade[this.stage]);
 		}
 	}
 }
