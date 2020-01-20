@@ -58,6 +58,11 @@ public class GameAlgo {
 			Point3D p = new Point3D(x, y);
 			n.setGuiLocation(p);
 			log.addNodePlaceMark("" + n.getLocation());
+			for (edge_data edge : g.getE(n.getKey())) {
+				node_data dest = g.getNode(edge.getDest());
+				node_data src = g.getNode(edge.getSrc());
+				log.addEdgePlacemark("" + src.getLocation(), "" + dest.getLocation());
+			}
 		}
 	}
 

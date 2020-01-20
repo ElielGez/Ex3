@@ -288,7 +288,7 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 			g.setColor(Color.ORANGE);
 			g.setFont(new Font("Arial", 1, 50));
 			g.drawString("Game Over!", 300, 500);
-			exportKML();
+//			exportKML();
 		}
 	}
 
@@ -458,7 +458,7 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 	private void showMyResults(int id) {
 		String[] columnNames = { "UserID", "LevelID", "score", "moves", "time" };
 		JFrame frame1 = new JFrame("My Game Results, Games Played: " + DBQueries.gamesPlayed(id));
-		frame1.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame1.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame1.setLayout(new BorderLayout());
 		DefaultTableModel tableModel = new DefaultTableModel();
 		for (String columnName : columnNames) {
@@ -481,7 +481,7 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 	private void showAllResults() {
 		String[] columnNames = { "UserID", "LevelID", "score", "moves", "time" };
 		JFrame frame1 = new JFrame("Game Results");
-		frame1.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame1.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame1.setLayout(new BorderLayout());
 		DefaultTableModel tableModel = new DefaultTableModel();
 		for (String columnName : columnNames) {

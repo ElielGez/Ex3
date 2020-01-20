@@ -16,6 +16,7 @@ public class KML_Logger {
 
 	/**
 	 * Constructor to create the begining of the kml file
+	 * 
 	 * @param name
 	 */
 	public KML_Logger(String name) {
@@ -62,15 +63,18 @@ public class KML_Logger {
 
 	/**
 	 * Function to add place mark by type (style id)
+	 * 
 	 * @param type
 	 * @param pos
 	 */
 	private void addPlaceMark(String type, String pos) {
 		LocalDateTime now = LocalDateTime.now();
 		content.append("    <Placemark>\r\n");
-		content.append("      <TimeStamp>\r\n");
-		content.append("        <when>" + now + "</when>\r\n");
-		content.append("      </TimeStamp>\r\n");
+		if (type != NODE_STYLE_ID) {
+			content.append("      <TimeStamp>\r\n");
+			content.append("        <when>" + now + "</when>\r\n");
+			content.append("      </TimeStamp>\r\n");
+		}
 		content.append("      <styleUrl>#" + type + "</styleUrl>\r\n");
 		content.append("      <Point>\r\n");
 		content.append("        <coordinates>" + pos + "</coordinates>\r\n");
@@ -81,6 +85,7 @@ public class KML_Logger {
 
 	/**
 	 * Function to create node place mark
+	 * 
 	 * @param pos
 	 */
 	public void addNodePlaceMark(String pos) {
@@ -89,6 +94,7 @@ public class KML_Logger {
 
 	/**
 	 * Function to create robot place mark
+	 * 
 	 * @param pos
 	 */
 	public void addRobotPlaceMark(String pos) {
@@ -97,11 +103,23 @@ public class KML_Logger {
 
 	/**
 	 * Function to create fruit place mark , banana or apple
+	 * 
 	 * @param fruit
 	 * @param pos
 	 */
 	public void addFruitPlaceMark(String fruit, String pos) {
 		addPlaceMark(fruit == "apple" ? APPLE_STYLE_ID : BANANA_STYLE_ID, pos);
+	}
+
+	public void addEdgePlacemark(String posSrc, String posDest) {
+		content.append("    <Placemark>\r\n");
+		content.append("      <LineString>\r\n");
+		content.append("      <extrude>5</extrude>\r\n");
+		content.append("      <altitudeMode>clampToGround</altitudeMode>\r\n");
+		content.append("      <coordinates>" + posSrc + "\r\n");
+		content.append("      " + posDest + "</coordinates>\r\n");
+		content.append("      </LineString>\r\n");
+		content.append("    </Placemark>\r\n");
 	}
 
 	/**
@@ -112,12 +130,16 @@ public class KML_Logger {
 		content.append("</kml>");
 		try {
 			PrintWriter pw = new PrintWriter(new File("data/" + name + ".kml")); // change to save on data folder
-																						// , and remove from git kmls
+																					// , and remove from git kmls
 			pw.write(content.toString());
 			pw.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 			return;
 		}
+	}
+
+	public String getContent() {
+		return content.toString();
 	}
 }

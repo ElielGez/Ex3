@@ -37,8 +37,8 @@ public class GameClient implements Runnable {
 	private static final int[] sleep = { 10/* 0 */, 50/* 1 */, 50/* 2 */, 30/* 3 */, 50/* 4 */, 50/* 5 */, 50/* 6 */,
 			50/* 7 */, 50/* 8 */, 50/* 9 */, 50/* 10 */, 50/* 11 */, 50/* 12 */, 50/* 13 */, 50/* 14 */, 50/* 15 */,
 			50/* 16 */, 50/* 17 */, 50/* 18 */, 50/* 19 */, 50/* 20 */, 50/* 21 */, 50/* 22 */, 4/* 23 */ };
-	
-	private static final int[] mod = { 10/* 0 */, 2/* 1 */, 2/* 2 */, 5/* 3 */, 2/* 4 */, 2/* 5 */, 2/* 6 */, 2/* 7 */,
+
+	private static final int[] mod = { 8/* 0 */, 2/* 1 */, 2/* 2 */, 5/* 3 */, 2/* 4 */, 2/* 5 */, 2/* 6 */, 2/* 7 */,
 			2/* 8 */, 2/* 9 */, 2/* 10 */, 2/* 11 */, 2/* 12 */, 2/* 13 */, 2/* 14 */, 2/* 15 */, 2/* 16 */, 2/* 17 */,
 			2/* 18 */, 2/* 19 */, 2/* 20 */, 2/* 21 */, 2/* 22 */, 15/* 23 */ };
 
@@ -208,7 +208,7 @@ public class GameClient implements Runnable {
 	@Override
 	public void run() { // this run works with stages : 3,5,11,13,19,20,23
 		try {
-			Game_Server.login(999);
+			Game_Server.login(206797516);
 			game.startGame();
 			int ind = 0;
 			long dt = sleep[stage];
@@ -230,8 +230,9 @@ public class GameClient implements Runnable {
 			g.upgradeMC();
 			if (this.exportKMLOnEnd)
 				log.closeDocument();
-			System.out.println(game.toString());
-//			calculateResults();
+//			System.out.println("stage: " + this.stage + " " + game.toString());
+			calculateResults();
+			game.sendKML(log.getContent());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
