@@ -368,55 +368,6 @@ public class GameAlgo {
 			return null;
 	}
 
-	/**
-	 * Function to move robots with auto algorithm
-	 * 
-	 * @param game
-	 * @param g
-	 */
-	public void moveRobotsAuto2(game_service game, graph g) {
-		graph_algo.init(g);
-		synchronized (robotList) {
-			for (Robot r : robotList) {
-				int i = 0;
-				boolean found = false;
-				while (!found) {
-					Fruit f = fruitList.get(i);
-					if (f.isOnTarget()) {
-						i++;
-						continue;
-					}
-					edge_data e = f.getEdge();
-					int src = r.getSrc();
-					int dest = -1;
-					int last = -1;
-					if (f.getType() == -1) {
-						dest = e.getDest() > e.getSrc() ? e.getSrc() : e.getDest();
-						last = e.getDest() > e.getSrc() ? e.getDest() : e.getSrc();
-					}
-					if (f.getType() == 1) {
-						dest = e.getDest() > e.getSrc() ? e.getDest() : e.getSrc();
-						last = e.getDest() > e.getSrc() ? e.getSrc() : e.getDest();
-					}
-					List<node_data> path = graph_algo.shortestPath(src, dest);
-					path.add(new Node(last));
-					if (path != null && path.size() > 1) {
-						moveByPath(r.getId(), path, game);
-						f.setOnTarget(true);
-						found = true;
-						continue;
-					} else {
-						i++;
-					}
-					if (i == fruitList.size()) {
-						found = true;
-						continue;
-					}
-				}
-				i++;
-			}
-		}
-	}
 
 	/**
 	 * Function to choose next edge by game server function
