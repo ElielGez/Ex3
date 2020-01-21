@@ -36,6 +36,11 @@ Main purpose of the project is to:
 * Menu bar options:
 	- New
 		- Game: Create new game and choose stage.
+	- Results
+		- My Results: Open popup to choose user id , and then show this user id max results (score)
+		- Stage Results: Open popup to choose user id , and then show the current game stage results with rank
+		between other users on this stage (The chosen user will be with char *)
+		- Game Results : Shows results of all users in every stage (max score)
 	
 ## Examples:
 
