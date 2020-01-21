@@ -169,7 +169,7 @@ public class DBQueries {
 	 */
 	public static LinkedHashMap<String, String> stageBestResults(int stage, int maxMoves) {
 		String query = "SELECT * FROM Logs as logs inner join ("
-				+ "SELECT max(score) as score, levelID, userID FROM Logs group by levelID,userID" + ") as groupedLogs"
+				+ "SELECT max(score) as score, levelID, userID,moves FROM Logs where moves <= " + maxMoves + " group by levelID,userID,moves" + ") as groupedLogs"
 				+ " on logs.userID = groupedLogs.userID and logs.levelID = groupedLogs.levelID and logs.score = groupedLogs.score"
 				+ " where logs.levelID = " + stage + " and logs.moves <= " + maxMoves
 				+ " order by logs.score desc,logs.moves asc";
@@ -179,7 +179,6 @@ public class DBQueries {
 			while (resultSet.next()) {
 				String value = "" + resultSet.getInt("userID") + "," + resultSet.getInt("levelID") + ","
 						+ resultSet.getInt("score") + "," + resultSet.getInt("moves") + "," + resultSet.getDate("time");
-				System.out.println(value);
 				String key = resultSet.getInt("userID") + "," + resultSet.getInt("levelID");
 				if (hp.get(key) == null)
 					hp.put(key, value);

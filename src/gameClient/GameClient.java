@@ -37,6 +37,7 @@ public class GameClient implements Runnable {
 		this.stage = stage;
 		this.exportKMLOnEnd = false;
 		log = new KML_Logger("" + stage);
+		Game_Server.login(316519966);
 		game = Game_Server.getServer(stage);
 		g = new DGraph();
 
@@ -191,7 +192,6 @@ public class GameClient implements Runnable {
 	@Override
 	public void run() {
 		try {
-			Game_Server.login(316519966);
 			game.startGame();
 			int ind = 0;
 			long dt = ExpectedResults.sleep[stage];
