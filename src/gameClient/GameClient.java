@@ -9,7 +9,6 @@ import Server.Game_Server;
 import Server.game_service;
 import dataStructure.DGraph;
 import dataStructure.graph;
-import dataStructure.node_data;
 
 public class GameClient implements Runnable {
 	private boolean isManual;
@@ -34,22 +33,24 @@ public class GameClient implements Runnable {
 	 * @param stage
 	 */
 	public GameClient(int stage) {
+		this();
 		this.stage = stage;
-		this.exportKMLOnEnd = true;
+		this.exportKMLOnEnd = false;
 		log = new KML_Logger("" + stage);
 		game = Game_Server.getServer(stage);
 		g = new DGraph();
 
 		g.initFromJson(game.getGraph());
-		initNodesLog();
 
 		game_algo = new GameAlgo();
+		game_algo.initNodes(g, log);
 		game_algo.initFruitsOnEdges(g, game, log);
 		game_algo.initRobotsOnNodes(g, game, log);
 	}
 
 	/**
 	 * Setter for export kml on end
+	 * 
 	 * @param exportKMLOnEnd
 	 */
 	public void setExportKMLOnEnd(boolean exportKMLOnEnd) {
@@ -162,15 +163,6 @@ public class GameClient implements Runnable {
 	}
 
 	/**
-	 * Function to init nodes on kml log
-	 */
-	private void initNodesLog() {
-		for (node_data n : this.g.getV()) {
-			this.log.addNodePlaceMark("" + n.getLocation());
-		}
-	}
-
-	/**
 	 * Setter for manual
 	 * 
 	 * @param isManual
@@ -187,17 +179,22 @@ public class GameClient implements Runnable {
 	public boolean IsManual() {
 		return this.isManual;
 	}
+	
+	public int getStage() {
+		return this.stage;
+	}
 
 	/**
 	 * Override function of runnable , this function run the game on thread and
 	 * moving every even number the robots
 	 */
 	@Override
-	public void run() {
+	public void run() { // stages that working : 0,1,3,5,11,13,19,23
 		try {
+			Game_Server.login(316519966);
 			game.startGame();
 			int ind = 0;
-			long dt = 50;
+			long dt = ExpectedResults.sleep[stage];
 			while (game.isRunning()) {
 				if (!isManual) {
 					game_algo.moveRobotsAuto(game, g);
@@ -205,20 +202,44 @@ public class GameClient implements Runnable {
 				game_algo.updateRobots(game, log);
 				game_algo.initFruitsOnEdges(g, game, log);
 
-				if (ind % 2 == 0) {
+				if (ind % ExpectedResults.mod[stage] == 0 && this.getGameMoves() < ExpectedResults.moves[stage]) {
 					game.move();
 					g.upgradeMC();
 				}
-				Thread.sleep(dt);
 				ind++;
+
+				Thread.sleep(dt);
 			}
 			g.upgradeMC();
 			if (this.exportKMLOnEnd)
 				log.closeDocument();
-			System.out.println(
-					"Stage: " + this.stage + ", Moves: " + this.getGameMoves() + ", Grade: " + this.getGameGrade());
+			System.out.println("Stage: " + this.getStage() + " , " + game.toString());
+			game.sendKML(log.getContent());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
+
+	/**
+	 * Function to calculate results
+	 */
+	private void calculateResults() {
+
+		int currentMoves = this.getGameMoves();
+		int currentGrade = this.getGameGrade();
+
+		boolean failed = false;
+		if (currentMoves > ExpectedResults.moves[this.stage] || currentGrade < ExpectedResults.grade[this.stage]) {
+			failed = true;
+		}
+		if (!failed) {
+			System.out.println("Stage: " + this.stage + ", Moves: " + this.getGameMoves() + ", Grade: "
+					+ this.getGameGrade() + " SUCCESS");
+		} else {
+			System.out.println("Stage: " + this.stage + ", Moves: " + this.getGameMoves() + ", Grade: "
+					+ this.getGameGrade() + " FAILED");
+			System.out.println("Expected: Moves: " + ExpectedResults.moves[this.stage] + ", Grade: " + ExpectedResults.grade[this.stage]);
+		}
+	}
+	
 }

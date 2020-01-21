@@ -1,5 +1,6 @@
 package gameClient;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -16,12 +17,21 @@ import java.awt.geom.Arc2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.Vector;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
 
 import dataStructure.Fruit;
 import dataStructure.Robot;
@@ -39,11 +49,11 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 	private int MOVE_TO_DEST = -1;
 
 	private static final String GAME = "Game";
+	private static final String MY_RESULTS = "My Results";
+	private static final String STAGE_RESULTS = "Stage Results";
+	private static final String GAME_RESULTS = "Game Results";
 	private final int WIDTH = 1000;
 	private final int HEIGHT = 1000;
-	private final int X_SCALE_TMIN = 15;
-	private final int Y_SCALE_TMIN = 200;
-	private final int Y_SCALE_TMAX = 50;
 
 	/**
 	 * Empty constructor
@@ -108,12 +118,23 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 		MenuBar menuBar = new MenuBar();
 		Menu menu1 = new Menu("New");
 		menuBar.add(menu1);
+		Menu menu2 = new Menu("Results");
+		menuBar.add(menu2);
 		this.setMenuBar(menuBar);
 
 		MenuItem game = new MenuItem(GAME);
 		game.addActionListener(this);
+		MenuItem my_results = new MenuItem(MY_RESULTS);
+		my_results.addActionListener(this);
+		MenuItem stage_results = new MenuItem(STAGE_RESULTS);
+		stage_results.addActionListener(this);
+		MenuItem game_results = new MenuItem(GAME_RESULTS);
+		game_results.addActionListener(this);
 
 		menu1.add(game);
+		menu2.add(my_results);
+		menu2.add(stage_results);
+		menu2.add(game_results);
 
 		this.addMouseListener(this);
 
@@ -166,54 +187,11 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 	}
 
 	/**
-	 * Function that scale the locations of nodes,robots and fruits
-	 */
-	private void setGuiLocations() {
-		graph g = this.gc.getGraph();
-		double x_scale[] = xAxis_Min_Max(g);
-		double y_scale[] = yAxis_Min_Max(g);
-
-		// node set guid location
-		for (node_data n : g.getV()) {
-			double x = scale(n.getLocation().x(), x_scale[0], x_scale[1], X_SCALE_TMIN, this.getWidth() - Y_SCALE_TMAX);
-			double y = scale(n.getLocation().y(), y_scale[1], y_scale[0], Y_SCALE_TMIN,
-					this.getHeight() - Y_SCALE_TMAX);
-			Point3D p = new Point3D(x, y);
-			n.setGuiLocation(p);
-		}
-
-		synchronized (ga.fruitList()) {
-			// fruit set gui location
-			for (Fruit f : ga.fruitList()) {
-				double xF = scale(f.getLocation().x(), x_scale[0], x_scale[1], X_SCALE_TMIN,
-						this.getWidth() - Y_SCALE_TMAX);
-				double yF = scale(f.getLocation().y(), y_scale[1], y_scale[0], Y_SCALE_TMIN,
-						this.getHeight() - Y_SCALE_TMAX);
-				Point3D pF = new Point3D(xF, yF);
-				f.setGuiLocation(pF);
-			}
-		}
-
-		synchronized (ga.robotList()) {
-			// robot set gui location
-			for (Robot r : ga.robotList()) {
-				double xR = scale(r.getLocation().x(), x_scale[0], x_scale[1], X_SCALE_TMIN,
-						this.getWidth() - Y_SCALE_TMAX);
-				double yR = scale(r.getLocation().y(), y_scale[1], y_scale[0], Y_SCALE_TMIN,
-						this.getHeight() - Y_SCALE_TMAX);
-				Point3D pR = new Point3D(xR, yR);
-				r.setGuiLocation(pR);
-			}
-		}
-	}
-
-	/**
 	 * Function that draw the graph with his nodes and edges
 	 * 
 	 * @param g1
 	 */
 	private void drawGraph(Graphics2D g) {
-		setGuiLocations();
 
 		g.setFont(new Font("Arial", 1, 15));
 		for (node_data src : this.getG().getV()) {
@@ -322,44 +300,6 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 		}
 	}
 
-	/**
-	 * Function to get min and max of xAxis , used on scale function
-	 * 
-	 * @param g
-	 * @return
-	 */
-	private double[] xAxis_Min_Max(graph g) {
-		double arr[] = { Double.MAX_VALUE, Double.MIN_VALUE }; // min [0] max [1]
-		for (node_data n : g.getV()) {
-			Point3D p = n.getLocation();
-			if (p.x() < arr[0])
-				arr[0] = p.x();
-			if (p.x() > arr[1])
-				arr[1] = p.x();
-
-		}
-		return arr;
-	}
-
-	/**
-	 * Function to get min and max of yAxis , used on scale function
-	 * 
-	 * @param g
-	 * @return
-	 */
-	private double[] yAxis_Min_Max(graph g) {
-		double arr[] = { Double.MAX_VALUE, Double.MIN_VALUE }; // min [0] max [1]
-		for (node_data n : g.getV()) {
-			Point3D p = n.getLocation();
-			if (p.y() < arr[0])
-				arr[0] = p.y();
-			if (p.y() > arr[1])
-				arr[1] = p.y();
-
-		}
-		return arr;
-	}
-
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		// TODO Auto-generated method stub
@@ -458,13 +398,39 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		String str = e.getActionCommand();
+		String id_str = "";
+		int id = 999;
 		switch (str) {
 		case GAME: {
 			chooseStagePopup();
 			break;
 		}
-
+		case MY_RESULTS: {
+			id_str = JOptionPane.showInputDialog(this, "Please insert id");
+			try {
+				id = Integer.parseInt(id_str);
+			} catch (Exception ex) {
+				JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
+			}
+			showMyResults(id);
+			break;
 		}
+		case STAGE_RESULTS: {
+			id_str = JOptionPane.showInputDialog(this, "Please insert id");
+			try {
+				id = Integer.parseInt(id_str);
+			} catch (Exception ex) {
+				JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
+			}
+			showStageResults(id, gc.getStage());
+			break;
+		}
+		case GAME_RESULTS: {
+			showAllResults();
+			break;
+		}
+		}
+
 	}
 
 	/**
@@ -511,17 +477,93 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 	}
 
 	/**
-	 * Function scale some point
-	 * 
-	 * @param data
-	 * @param r_min
-	 * @param r_max
-	 * @param t_min
-	 * @param t_max
-	 * @return
+	 * Function to show in table the results of user by id
+	 * @param id
 	 */
-	private double scale(double data, double r_min, double r_max, double t_min, double t_max) {
-		double res = ((data - r_min) / (r_max - r_min)) * (t_max - t_min) + t_min;
-		return res;
+	private void showMyResults(int id) {
+		String[] columnNames = { "UserID", "LevelID", "score", "moves", "time" };
+		JFrame frame1 = new JFrame("User: " + id + " Results, Games Played: " + DBQueries.gamesPlayed(id));
+		frame1.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		frame1.setLayout(new BorderLayout());
+		DefaultTableModel tableModel = new DefaultTableModel();
+		for (String columnName : columnNames) {
+			tableModel.addColumn(columnName);
+		}
+		TreeMap<Integer, String> tp = DBQueries.myBestResults(id);
+		for (Map.Entry<Integer, String> entry : tp.entrySet()) {
+			tableModel.addRow(entry.getValue().split(","));
+		}
+
+		JTable table = new JTable(tableModel);
+		JScrollPane scroll = new JScrollPane(table);
+		scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		frame1.add(scroll);
+		frame1.setSize(600, 400);
+		frame1.setVisible(true);
 	}
+
+	/**
+	 * Function to show leaderboard of stage and where user id is located , in table
+	 * @param id
+	 * @param stage
+	 */
+	private void showStageResults(int id, int stage) {
+		String[] columnNames = { "Rank", "UserID", "LevelID", "score", "moves", "time" };
+		JFrame frame1 = new JFrame("Stage: " + stage + " Results");
+		frame1.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		frame1.setLayout(new BorderLayout());
+		DefaultTableModel tableModel = new DefaultTableModel();
+		for (String columnName : columnNames) {
+			tableModel.addColumn(columnName);
+		}
+		LinkedHashMap<String, String> tp = DBQueries.stageBestResults(stage, ExpectedResults.moves[stage]);
+		int rank = 1;
+		for (Map.Entry<String, String> entry : tp.entrySet()) {
+			Vector<String> v1 = new Vector<String>();
+			v1.add("" + rank);
+			String value[] = entry.getValue().split(",");
+			if (value[0].equals("" + id))
+				value[0] = "*" + value[0];
+			Vector<String> v2 = new Vector<String>(Arrays.asList(value));
+			v1.addAll(v2);
+			tableModel.addRow(v1);
+			rank++;
+		}
+
+		JTable table = new JTable(tableModel);
+		JScrollPane scroll = new JScrollPane(table);
+		scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		frame1.add(scroll);
+		frame1.setSize(400, 300);
+		frame1.setVisible(true);
+	}
+
+	/**
+	 * Function to show all games results in table
+	 */
+	private void showAllResults() {
+		String[] columnNames = { "UserID", "LevelID", "score", "moves", "time" };
+		JFrame frame1 = new JFrame("Game Results");
+		frame1.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		frame1.setLayout(new BorderLayout());
+		DefaultTableModel tableModel = new DefaultTableModel();
+		for (String columnName : columnNames) {
+			tableModel.addColumn(columnName);
+		}
+		TreeMap<String, String> tp = DBQueries.gameBestResults();
+		for (Map.Entry<String, String> entry : tp.entrySet()) {
+			tableModel.addRow(entry.getValue().split(","));
+		}
+
+		JTable table = new JTable(tableModel);
+		JScrollPane scroll = new JScrollPane(table);
+		scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		frame1.add(scroll);
+		frame1.setSize(400, 300);
+		frame1.setVisible(true);
+	}
+
 }
