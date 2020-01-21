@@ -189,7 +189,7 @@ public class GameClient implements Runnable {
 	 * moving every even number the robots
 	 */
 	@Override
-	public void run() { // stages that working : 0,1,3,5,11,13,19,23
+	public void run() {
 		try {
 			Game_Server.login(316519966);
 			game.startGame();
