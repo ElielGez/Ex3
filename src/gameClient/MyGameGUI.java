@@ -501,7 +501,7 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 
 	private void showStageResults(int id, int stage) {
 		String[] columnNames = { "Rank", "UserID", "LevelID", "score", "moves", "time" };
-		JFrame frame1 = new JFrame("Stage Results");
+		JFrame frame1 = new JFrame("Stage: " + stage + " Results");
 		frame1.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame1.setLayout(new BorderLayout());
 		DefaultTableModel tableModel = new DefaultTableModel();
