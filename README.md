@@ -1,7 +1,7 @@
 # Ariel OOP - Ex3 The Maze of Waze
 
 <p align="center">
-  <img alt="graph" src="https://github.com/ElielGez/Ex3/blob/master/images/Capture.JPG">
+  <img alt="graph" src="https://github.com/ElielGez/Ex3/blob/master/images/Capture2.JPG">
 </p>
 
 ## Introduction:
