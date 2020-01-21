@@ -213,13 +213,16 @@ public class GameClient implements Runnable {
 			g.upgradeMC();
 			if (this.exportKMLOnEnd)
 				log.closeDocument();
-			calculateResults();
+			System.out.println("Stage: " + this.getStage() + " , " + game.toString());
 			game.sendKML(log.getContent());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
+	/**
+	 * Function to calculate results
+	 */
 	private void calculateResults() {
 
 		int currentMoves = this.getGameMoves();

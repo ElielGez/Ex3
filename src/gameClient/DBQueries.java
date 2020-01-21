@@ -26,6 +26,11 @@ public class DBQueries {
 	private static Connection connection = null;
 	private static Statement statement = null;
 
+	/**
+	 * Function to execute query from db
+	 * @param query
+	 * @return
+	 */
 	private static ResultSet doQuery(String query) {
 		ResultSet resultSet = null;
 		try {
@@ -44,6 +49,10 @@ public class DBQueries {
 		return resultSet;
 	}
 
+	/**
+	 * Function to query meta data of table
+	 * @param query
+	 */
 	public static void queryMetaData(String query) {
 		ResultSet resultSet = doQuery(query);
 		try {
@@ -62,6 +71,10 @@ public class DBQueries {
 		closeQuery(resultSet);
 	}
 
+	/**
+	 * Function to close the query and connection to db
+	 * @param resultSet
+	 */
 	private static void closeQuery(ResultSet resultSet) {
 		try {
 			resultSet.close();
@@ -73,6 +86,11 @@ public class DBQueries {
 		}
 	}
 
+	/**
+	 * Function to get how much games user played
+	 * @param id
+	 * @return
+	 */
 	public static int gamesPlayed(int id) {
 		ResultSet resultSet = doQuery("select * from Logs where userID = " + id);
 		int count = 0;
@@ -89,6 +107,11 @@ public class DBQueries {
 		return count;
 	}
 
+	/**
+	 * Function to query user best results by max score
+	 * @param id
+	 * @return
+	 */
 	public static TreeMap<Integer, String> myBestResults(int id) {
 		String query = "SELECT * FROM Logs as logs inner join (" + "SELECT max(score) as score, levelID FROM Logs"
 				+ " where userID = " + id + " group by levelID" + ") as groupedLogs"
@@ -111,6 +134,10 @@ public class DBQueries {
 		return tp;
 	}
 
+	/**
+	 * Function to query game best results by max score
+	 * @return
+	 */
 	public static TreeMap<String, String> gameBestResults() {
 		String query = "SELECT * FROM Logs as logs inner join ("
 				+ "SELECT max(score) as score, levelID, userID FROM Logs" + "	group by levelID,userID"
@@ -134,18 +161,28 @@ public class DBQueries {
 		return tp;
 	}
 
-	public static LinkedHashMap<String, String> stageBestResults(int stage,int maxMoves) {
+	/**
+	 * Function to query stage best results by max score and maxMoves
+	 * @param stage
+	 * @param maxMoves
+	 * @return
+	 */
+	public static LinkedHashMap<String, String> stageBestResults(int stage, int maxMoves) {
 		String query = "SELECT * FROM Logs as logs inner join ("
 				+ "SELECT max(score) as score, levelID, userID FROM Logs group by levelID,userID" + ") as groupedLogs"
 				+ " on logs.userID = groupedLogs.userID and logs.levelID = groupedLogs.levelID and logs.score = groupedLogs.score"
-				+ " where logs.levelID = " + stage + " and logs.moves <= " + maxMoves + " order by logs.score desc";
+				+ " where logs.levelID = " + stage + " and logs.moves <= " + maxMoves
+				+ " order by logs.score desc,logs.moves asc";
 		ResultSet resultSet = doQuery(query);
 		LinkedHashMap<String, String> hp = new LinkedHashMap<String, String>();
 		try {
 			while (resultSet.next()) {
 				String value = "" + resultSet.getInt("userID") + "," + resultSet.getInt("levelID") + ","
 						+ resultSet.getInt("score") + "," + resultSet.getInt("moves") + "," + resultSet.getDate("time");
-				hp.put(resultSet.getInt("userID") + "," + resultSet.getInt("levelID"), value);
+				System.out.println(value);
+				String key = resultSet.getInt("userID") + "," + resultSet.getInt("levelID");
+				if (hp.get(key) == null)
+					hp.put(key, value);
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -154,7 +191,13 @@ public class DBQueries {
 		closeQuery(resultSet);
 		return hp;
 	}
-	
+
+	/**
+	 * Function to get kml string from db
+	 * @param id
+	 * @param level
+	 * @return
+	 */
 	public static String getKML(int id, int level) {
 		String ans = null;
 		String query = "SELECT * FROM Users where userID=" + id + ";";

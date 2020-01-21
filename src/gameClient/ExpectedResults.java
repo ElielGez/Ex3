@@ -1,6 +1,10 @@
 package gameClient;
 
 public class ExpectedResults {
+	/**
+	 * This class holds the expected moves and grade on each stage
+	 * In addition , I manage from here the modulo and sleep time for every stage
+	 */
 	public static final int[] moves = { 290/* 0 */, 580/* 1 */, Integer.MAX_VALUE/* 2 */, 580/* 3 */,
 			Integer.MAX_VALUE/* 4 */, 500/* 5 */, Integer.MAX_VALUE/* 6 */, Integer.MAX_VALUE/* 7 */,
 			Integer.MAX_VALUE/* 8 */, 580/* 9 */, Integer.MAX_VALUE/* 10 */, 580/* 11 */, Integer.MAX_VALUE/* 12 */,

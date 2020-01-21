@@ -111,6 +111,11 @@ public class KML_Logger {
 		addPlaceMark(fruit == "apple" ? APPLE_STYLE_ID : BANANA_STYLE_ID, pos);
 	}
 
+	/**
+	 * Function to add edges on kml file
+	 * @param posSrc
+	 * @param posDest
+	 */
 	public void addEdgePlacemark(String posSrc, String posDest) {
 		content.append("    <Placemark>\r\n");
 		content.append("      <LineString>\r\n");

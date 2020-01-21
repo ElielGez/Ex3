@@ -476,9 +476,13 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 		}
 	}
 
+	/**
+	 * Function to show in table the results of user by id
+	 * @param id
+	 */
 	private void showMyResults(int id) {
 		String[] columnNames = { "UserID", "LevelID", "score", "moves", "time" };
-		JFrame frame1 = new JFrame("My Game Results, Games Played: " + DBQueries.gamesPlayed(id));
+		JFrame frame1 = new JFrame("User: " + id + " Results, Games Played: " + DBQueries.gamesPlayed(id));
 		frame1.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame1.setLayout(new BorderLayout());
 		DefaultTableModel tableModel = new DefaultTableModel();
@@ -499,6 +503,11 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 		frame1.setVisible(true);
 	}
 
+	/**
+	 * Function to show leaderboard of stage and where user id is located , in table
+	 * @param id
+	 * @param stage
+	 */
 	private void showStageResults(int id, int stage) {
 		String[] columnNames = { "Rank", "UserID", "LevelID", "score", "moves", "time" };
 		JFrame frame1 = new JFrame("Stage: " + stage + " Results");
@@ -513,7 +522,10 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 		for (Map.Entry<String, String> entry : tp.entrySet()) {
 			Vector<String> v1 = new Vector<String>();
 			v1.add("" + rank);
-			Vector<String> v2 = new Vector<String>(Arrays.asList(entry.getValue().split(",")));
+			String value[] = entry.getValue().split(",");
+			if (value[0].equals("" + id))
+				value[0] = "*" + value[0];
+			Vector<String> v2 = new Vector<String>(Arrays.asList(value));
 			v1.addAll(v2);
 			tableModel.addRow(v1);
 			rank++;
@@ -528,6 +540,9 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 		frame1.setVisible(true);
 	}
 
+	/**
+	 * Function to show all games results in table
+	 */
 	private void showAllResults() {
 		String[] columnNames = { "UserID", "LevelID", "score", "moves", "time" };
 		JFrame frame1 = new JFrame("Game Results");

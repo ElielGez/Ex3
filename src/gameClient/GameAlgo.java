@@ -317,6 +317,11 @@ public class GameAlgo {
 		game.chooseNextEdge(id, dest);
 	}
 
+	/**
+	 * Function to move robots by auto
+	 * @param game
+	 * @param g
+	 */
 	public void moveRobotsAuto(game_service game, graph g) {
 		synchronized (game) {
 			graph_algo.init(g);
@@ -347,6 +352,12 @@ public class GameAlgo {
 		}
 	}
 
+	/**
+	 * Function to find path by dikstra between robot and fruit
+	 * @param r
+	 * @param f
+	 * @return
+	 */
 	private List<node_data> findPathsRobotToFruit(Robot r, Fruit f) {
 		edge_data e = f.getEdge();
 		int src = r.getSrc();
