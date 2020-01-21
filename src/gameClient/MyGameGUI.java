@@ -508,7 +508,7 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 		for (String columnName : columnNames) {
 			tableModel.addColumn(columnName);
 		}
-		LinkedHashMap<String, String> tp = DBQueries.stageBestResults(stage);
+		LinkedHashMap<String, String> tp = DBQueries.stageBestResults(stage, ExpectedResults.moves[stage]);
 		int rank = 1;
 		for (Map.Entry<String, String> entry : tp.entrySet()) {
 			Vector<String> v1 = new Vector<String>();

@@ -134,11 +134,11 @@ public class DBQueries {
 		return tp;
 	}
 
-	public static LinkedHashMap<String, String> stageBestResults(int stage) {
+	public static LinkedHashMap<String, String> stageBestResults(int stage,int maxMoves) {
 		String query = "SELECT * FROM Logs as logs inner join ("
 				+ "SELECT max(score) as score, levelID, userID FROM Logs group by levelID,userID" + ") as groupedLogs"
 				+ " on logs.userID = groupedLogs.userID and logs.levelID = groupedLogs.levelID and logs.score = groupedLogs.score"
-				+ " where logs.levelID = " + stage + " order by logs.score desc";
+				+ " where logs.levelID = " + stage + " and logs.moves <= " + maxMoves + " order by logs.score desc";
 		ResultSet resultSet = doQuery(query);
 		LinkedHashMap<String, String> hp = new LinkedHashMap<String, String>();
 		try {
@@ -153,5 +153,20 @@ public class DBQueries {
 		}
 		closeQuery(resultSet);
 		return hp;
+	}
+	
+	public static String getKML(int id, int level) {
+		String ans = null;
+		String query = "SELECT * FROM Users where userID=" + id + ";";
+		ResultSet resultSet = doQuery(query);
+		try {
+			if (resultSet != null && resultSet.next()) {
+				ans = resultSet.getString("kml_" + level);
+			}
+		} catch (SQLException sqle) {
+			System.out.println("SQLException: " + sqle.getMessage());
+			System.out.println("Vendor Error: " + sqle.getErrorCode());
+		}
+		return ans;
 	}
 }
