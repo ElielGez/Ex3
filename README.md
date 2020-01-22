@@ -1,4 +1,4 @@
-# Ariel OOP - Ex3 The Maze of Waze
+# Ariel OOP - Ex3&Ex4 The Maze of Waze
 
 <p align="center">
   <img alt="graph" src="https://github.com/ElielGez/Ex3/blob/master/images/Capture2.JPG">
@@ -41,7 +41,17 @@ Main purpose of the project is to:
 		- Stage Results: Open popup to choose user id , and then show the current game stage results with rank
 		between other users on this stage (The chosen user will be with char *)
 		- Game Results : Shows results of all users in every stage (max score)
-	
+
+## Auto algorithm for moving robots while game is running:
+Every iteration of game thread (while he is running) i'm doing this steps:
+
+1. Iterate over robots and fruits.
+2. Every robot and fruit I check if there shortest path between both of them.
+3. If there is a path , I'm saving both of them in arraylist of RobotFruitPath with their distance.
+4. After I finish iterate the robots and fruits on the list , I'm sorting the above arraylist by distance (from lower to higher).
+5. After that , run each item on the arraylist and calling chooseNextEdge on the path.
+6. Mark the fruit as targeted (prevent other robot going this fruit).
+
 ## Examples:
 
 #### Fruit Class:
