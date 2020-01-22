@@ -28,6 +28,15 @@ public class GameAlgo {
 	private RobotFruitPathContainer rfpArray;
 	private double x_scale[];
 	private double y_scale[];
+	private long dt = 50;
+
+	public long getDt() {
+		return dt;
+	}
+
+	public void setDt(long dt) {
+		this.dt = dt;
+	}
 
 	private final int WIDTH = 1000;
 	private final int HEIGHT = 1000;
@@ -319,6 +328,7 @@ public class GameAlgo {
 
 	/**
 	 * Function to move robots by auto
+	 * 
 	 * @param game
 	 * @param g
 	 */
@@ -344,7 +354,7 @@ public class GameAlgo {
 			rfpArray.sort();
 			for (RobotFruitPath rfp : rfpArray.getList()) {
 				if (!rfp.getF().isOnTarget()) {
-					moveByPath(rfp.getR().getId(), rfp.getPath(), game);
+					moveByPath(rfp.getR(), rfp.getPath(), game);
 					rfp.getF().setOnTarget(true);
 				}
 
@@ -354,6 +364,7 @@ public class GameAlgo {
 
 	/**
 	 * Function to find path by dikstra between robot and fruit
+	 * 
 	 * @param r
 	 * @param f
 	 * @return
@@ -379,7 +390,6 @@ public class GameAlgo {
 			return null;
 	}
 
-
 	/**
 	 * Function to choose next edge by game server function
 	 * 
@@ -387,10 +397,20 @@ public class GameAlgo {
 	 * @param path
 	 * @param game
 	 */
-	public void moveByPath(int rid, List<node_data> path, game_service game) {
+	public void moveByPath(Robot r, List<node_data> path, game_service game) {
 		for (int i = 1; i < path.size(); i++) {
 			node_data n = path.get(i);
-			game.chooseNextEdge(rid, n.getKey());
+			game.chooseNextEdge(r.getId(), n.getKey());
 		}
+	}
+
+	private long calculateDt(graph g, Fruit f, Robot r) {
+		long dt;
+		Point3D pSrc = g.getNode(f.getEdge().getSrc()).getGuiLocation();
+		Point3D pDest = g.getNode(f.getEdge().getDest()).getGuiLocation();
+		double n = (f.getGuiLocation().distance2D(pDest) / pSrc.distance2D(pDest));
+		dt = (long) ((n * f.getEdge().getWeight()) / r.getSpeed());
+//		System.out.println(dt);
+		return dt;
 	}
 }
