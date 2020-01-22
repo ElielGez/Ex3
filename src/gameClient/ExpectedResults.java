@@ -11,11 +11,11 @@ public class ExpectedResults {
 			580/* 13 */, Integer.MAX_VALUE/* 14 */, Integer.MAX_VALUE/* 15 */, 290/* 16 */, Integer.MAX_VALUE/* 17 */,
 			Integer.MAX_VALUE/* 18 */, 580/* 19 */, 290/* 20 */, Integer.MAX_VALUE/* 21 */, Integer.MAX_VALUE/* 22 */,
 			1140/* 23 */ };
-	public static final int[] grade = { 145/* 0 */, 450/* 1 */, Integer.MAX_VALUE/* 2 */, 720/* 3 */,
-			Integer.MAX_VALUE/* 4 */, 570/* 5 */, Integer.MAX_VALUE/* 6 */, Integer.MAX_VALUE/* 7 */,
-			Integer.MAX_VALUE/* 8 */, 510/* 9 */, Integer.MAX_VALUE/* 10 */, 1050/* 11 */, Integer.MAX_VALUE/* 12 */,
-			310/* 13 */, Integer.MAX_VALUE/* 14 */, Integer.MAX_VALUE/* 15 */, 235/* 16 */, Integer.MAX_VALUE/* 17 */,
-			Integer.MAX_VALUE/* 18 */, 250/* 19 */, 200/* 20 */, Integer.MAX_VALUE/* 21 */, Integer.MAX_VALUE/* 22 */,
+	public static final int[] grade = { 125/* 0 */, 436/* 1 */, Integer.MIN_VALUE/* 2 */, 713/* 3 */,
+			Integer.MIN_VALUE/* 4 */, 570/* 5 */, Integer.MIN_VALUE/* 6 */, Integer.MIN_VALUE/* 7 */,
+			Integer.MIN_VALUE/* 8 */, 480/* 9 */, Integer.MIN_VALUE/* 10 */, 1050/* 11 */, Integer.MIN_VALUE/* 12 */,
+			310/* 13 */, Integer.MIN_VALUE/* 14 */, Integer.MIN_VALUE/* 15 */, 235/* 16 */, Integer.MIN_VALUE/* 17 */,
+			Integer.MIN_VALUE/* 18 */, 250/* 19 */, 200/* 20 */, Integer.MIN_VALUE/* 21 */, Integer.MIN_VALUE/* 22 */,
 			1000/* 23 */ };
 	public static final int[] sleep = { 10/* 0 */, 10/* 1 */, 10/* 2 */, 10/* 3 */, 10/* 4 */, 10/* 5 */, 10/* 6 */,
 			10/* 7 */, 10/* 8 */, 10/* 9 */, 10/* 10 */, 50/* 11 */, 10/* 12 */, 52/* 13 */, 10/* 14 */, 10/* 15 */,
