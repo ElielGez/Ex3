@@ -193,13 +193,13 @@ public class GameClient implements Runnable {
 			int ind = 0;
 			long dt = ExpectedResults.sleep[stage];
 			while (game.isRunning()) {
-				if (!isManual) {
+				if (!isManual && this.getGameMoves() < ExpectedResults.moves[stage]) {
 					game_algo.moveRobotsAuto(game, g);
 				}
 				game_algo.updateRobots(game, log);
 				game_algo.initFruitsOnEdges(g, game, log);
 
-				if (ind % ExpectedResults.mod[stage] == 0 && this.getGameMoves() < ExpectedResults.moves[stage]) {
+				if (ind % ExpectedResults.mod[stage] == 0) {
 					game.move();
 					g.upgradeMC();
 				}
