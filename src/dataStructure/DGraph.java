@@ -266,4 +266,12 @@ public class DGraph implements graph, Serializable {
 
 	}
 
+	/**
+	 * Getter for edges size
+	 * @return
+	 */
+	public int getEdgesSize() {
+		return edgesSize;
+	}
+
 }

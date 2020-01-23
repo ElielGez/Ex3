@@ -12,7 +12,7 @@ public class GameClientTest {
 //		runStage(0);
 		//stages = new int[] { 0, 1, 3, 5, 9, 11, 13, 16, 19, 20, 23 };
 //		stages = new int[] { 1 };
-		runAllStages();
+//		runAllStages();
 	}
 
 	/**
