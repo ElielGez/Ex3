@@ -139,8 +139,6 @@ public class KML_Logger {
 			pw.write(content.toString());
 			pw.close();
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			return;
 		}
 	}
 

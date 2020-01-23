@@ -44,7 +44,6 @@ public class DBQueries {
 			System.out.println("SQLException: " + sqle.getMessage());
 			System.out.println("Vendor Error: " + sqle.getErrorCode());
 		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
 		}
 		return resultSet;
 	}
@@ -82,7 +81,6 @@ public class DBQueries {
 			statement.close();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 	}
 
@@ -100,7 +98,6 @@ public class DBQueries {
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 
 		closeQuery(resultSet);
@@ -128,7 +125,6 @@ public class DBQueries {
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 		closeQuery(resultSet);
 		return tp;
@@ -155,7 +151,6 @@ public class DBQueries {
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 		closeQuery(resultSet);
 		return tp;
@@ -185,7 +180,6 @@ public class DBQueries {
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 		closeQuery(resultSet);
 		return hp;

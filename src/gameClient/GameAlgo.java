@@ -155,7 +155,6 @@ public class GameAlgo {
 			this.updateRobots(game, log);
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 
 	}

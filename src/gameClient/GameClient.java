@@ -106,7 +106,6 @@ public class GameClient implements Runnable {
 			JSONObject line = new JSONObject(results);
 			gs = line.getJSONObject("GameServer");
 		} catch (JSONException e) {
-			e.printStackTrace();
 		}
 		return gs;
 	}
@@ -123,7 +122,6 @@ public class GameClient implements Runnable {
 			grade = gs.getInt("grade");
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 		return grade;
 	}
@@ -140,7 +138,6 @@ public class GameClient implements Runnable {
 			moves = gs.getInt("moves");
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 		return moves;
 	}
@@ -216,7 +213,6 @@ public class GameClient implements Runnable {
 			System.out.println("Stage: " + this.getStage() + " , " + game.toString());
 			game.sendKML(log.getContent());
 		} catch (Exception e) {
-			e.printStackTrace();
 		}
 	}
 

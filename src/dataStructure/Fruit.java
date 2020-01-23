@@ -41,7 +41,6 @@ public class Fruit {
 			this.setType(fruit.getInt("type"));
 			this.setOnTarget(false);
 		} catch (JSONException e) {
-			e.printStackTrace();
 		}
 	}
 

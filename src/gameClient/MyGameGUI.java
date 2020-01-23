@@ -266,7 +266,6 @@ public class MyGameGUI extends JFrame implements ActionListener, MouseListener {
 					}
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
-					e.printStackTrace();
 				}
 
 			}

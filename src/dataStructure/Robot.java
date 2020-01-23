@@ -48,7 +48,6 @@ public class Robot {
 			this.setDest(robot.getInt("dest"));
 			this.setSpeed(robot.getDouble("speed"));
 		} catch (JSONException e) {
-			e.printStackTrace();
 		}
 	}
 
